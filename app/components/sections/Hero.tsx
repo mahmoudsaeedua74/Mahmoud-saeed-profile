@@ -25,16 +25,16 @@ export default function Hero() {
 
   // 1. Entrance Animation - Triggered after loading screen
   useGSAP(() => {
-    // Hide elements IMMEDIATELY on mount
-    gsap.set('.hero-greeting span, .hero-name, .hero-sub-text, .hero-role-title, .hero-role-text, .hero-social-container, .hero-btn', {
+    // Hide elements IMMEDIATELY on mount (including hero-name now!)
+    gsap.set('.hero-greeting-word, .hero-name, .hero-sub-text, .hero-role-title, .hero-role-text, .hero-social-container, .hero-btn', {
       opacity: 0
     });
 
     const startAnimation = () => {
       const tl = gsap.timeline({ delay: 0.3 });
 
-      // Smooth slide from LEFT for greeting text
-      tl.fromTo('.hero-greeting span', 
+      // Smooth slide from LEFT for greeting words only (not the name)
+      tl.fromTo('.hero-greeting-word', 
         {
           x: -100,
           opacity: 0,
@@ -47,7 +47,7 @@ export default function Hero() {
           ease: 'power3.out',
         }
       )
-        // Name animates the SAME WAY as greeting
+        // Name animates separately with same style
         .fromTo('.hero-name',
           {
             x: -100,
@@ -186,9 +186,9 @@ export default function Hero() {
 
           <div className="hero-greeting head-1 uppercase font-black text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] flex flex-wrap gap-x-4 gap-y-2 justify-center md:justify-start">
             {"Hi, My Name Is".split(" ").map((word, idx) => (
-              <span key={idx} className="inline-block whitespace-nowrap">{word}</span>
+              <span key={idx} className="hero-greeting-word inline-block whitespace-nowrap">{word}</span>
             ))}
-            <span className="hero-name text-indigo-500 block w-full mt-4 ">Mahmoud</span>
+            <span className="hero-name text-indigo-500 block w-full mt-4">Mahmoud</span>
           </div>
 
           <div className="hero-sub-text flex flex-col items-center md:items-start space-y-8 ">
@@ -199,7 +199,7 @@ export default function Hero() {
               </span>
             </div>
 
-            <div className="cursor-target flex items-center gap-3 bg-slate-900/40 border border-slate-800/60 px-6 py-3 rounded-full transition-all hover:bg-slate-900/80 hover:border-indigo-500/30">
+            <div className="flex items-center gap-3 bg-slate-900/40 border border-slate-800/60 px-6 py-3 rounded-full hover:bg-slate-900/80 hover:border-indigo-500/30">
               <div className="w-3 h-3 rounded-full bg-emerald-500 animate-[pulse_1.5s_infinite] shadow-[0_0_15px_#10b981]" />
               <span className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em]">Available For Projects</span>
             </div>
