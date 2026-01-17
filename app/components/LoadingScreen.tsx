@@ -11,7 +11,7 @@ export default function LoadingScreen() {
     // Trigger shake effect at 4 seconds
     const timer = setTimeout(() => {
       setShakePhase(true);
-    }, 500000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -32,9 +32,10 @@ export default function LoadingScreen() {
           animate={
             shakePhase
               ? {
-                  x: [0, -15, 20, -10, 15, -20, 10, -5, 0],
-                  y: [0, 10, -15, 20, -10, 15, -20, 10, 0],
-                  rotateZ: [0, -2, 3, -2, 1, -1, 2, -1, 0],
+                  x: [0, -20, 25, -15, 20, -25, 15, -10, 0],
+                  y: [0, 15, -20, 25, -15, 20, -25, 15, 0],
+                  rotateZ: [0, -3, 4, -3, 2, -2, 3, -2, 0],
+                  scale: [1, 1.05, 0.95, 1.05, 0.95, 1.05, 0.95, 1],
                 }
               : {}
           }
@@ -50,15 +51,13 @@ export default function LoadingScreen() {
             className="relative"
           >
             <Image
-              src="/logo.jpg"
+              src="/logo2.png"
               alt="Mahmoud Saeed Logo"
               width={400}
               height={400}
               priority
-              className="rounded-lg shadow-2xl"
-              style={{
-                filter: 'drop-shadow(0 0 30px rgba(124, 122, 255, 0.3))',
-              }}
+              className="rounded-lg "
+            
             />
           </motion.div>
         </motion.div>
@@ -66,19 +65,30 @@ export default function LoadingScreen() {
         {/* Orbiting Dot with 3D effect */}
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-          style={{ width: '800px', height: '800px' }}
+          style={{ width: '500px', height: '500px' }}
         >
-          {/* Orbit path visualization (optional) */}
-          <div className="absolute inset-0 rounded-full border border-purple-500/10" />
+          {/* Orbit path visualization */}
+          <motion.div 
+            className="absolute inset-0 rounded-full border border-indigo-500/20"
+            animate={{
+              scale: [1, 1.05, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
 
-          {/* The animated dot */}
+          {/* The animated dot - accelerating orbit */}
           <motion.div
             className="absolute top-0 left-1/2 -translate-x-1/2"
             animate={{
               rotate: [0, 360],
             }}
             transition={{
-              duration: 6,
+              duration: 3,
               ease: 'linear',
               repeat: Infinity,
             }}
@@ -87,83 +97,128 @@ export default function LoadingScreen() {
             <motion.div
               className="absolute top-0 left-1/2 -translate-x-1/2"
               animate={{
-                scale: [1, 1.3, 1],
-                y: [0, -20, 0],
+                scale: [1, 1.4, 1],
+                y: [0, -25, 0],
               }}
               transition={{
-                duration: 6,
+                duration: 3,
                 ease: 'easeInOut',
                 repeat: Infinity,
               }}
             >
-              {/* Glowing dot with trail effect */}
+              {/* Glowing dot container */}
               <motion.div
                 className="relative"
                 animate={{
                   rotate: [0, -360],
                 }}
                 transition={{
-                  duration: 6,
+                  duration: 3,
                   ease: 'linear',
                   repeat: Infinity,
                 }}
               >
-                {/* Outer glow */}
-                <div className="absolute inset-0 w-6 h-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/30 blur-xl animate-pulse" />
-                
-                {/* Main dot */}
-                <motion.div
-                  className="w-6 h-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 shadow-lg"
-                  style={{
-                    boxShadow:
-                      '0 0 20px rgba(124, 122, 255, 0.8), 0 0 40px rgba(124, 122, 255, 0.4)',
-                  }}
+                {/* Outer glow - brand color */}
+                <motion.div 
+                  className="absolute inset-0 w-12 h-12 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl"
+                  style={{ backgroundColor: '#4F46E5' }}
                   animate={{
-                    scale: [1, 1.2, 1],
+                    scale: [1, 1.5, 1],
+                    opacity: [0.3, 0.5, 0.3],
                   }}
                   transition={{
-                    duration: 0.5,
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+                
+                {/* Middle glow */}
+                <motion.div 
+                  className="absolute inset-0 w-9 h-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
+                  style={{ backgroundColor: '#4F46E5' }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.6, 0.8, 0.6],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+                
+                {/* Main dot - solid brand color */}
+                <motion.div
+                  className="w-8 h-8 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    backgroundColor: '#4F46E5',
+                    boxShadow: `
+                      0 0 15px #4F46E5,
+                      0 0 30px rgba(79, 70, 229, 0.7),
+                      0 0 45px rgba(79, 70, 229, 0.4)
+                    `,
+                  }}
+                  animate={{
+                    scale: [1, 1.15, 1],
+                  }}
+                  transition={{
+                    duration: 0.8,
                     ease: 'easeInOut',
                     repeat: Infinity,
                   }}
-                />
+                >
+                
+                </motion.div>
 
                 {/* Trail effect */}
                 <motion.div
-                  className="absolute top-0 left-0 w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-400/50 blur-sm"
-                  style={{ marginLeft: '-10px' }}
+                  className="absolute top-0 left-0 w-5 h-5 -translate-x-1/2 -translate-y-1/2 rounded-full blur-sm"
+                  style={{ 
+                    marginLeft: '-15px',
+                    backgroundColor: '#4F46E5',
+                  }}
+                  animate={{
+                    opacity: [0.4, 0.2, 0.4],
+                    scale: [1, 0.8, 1],
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                  }}
                 />
               </motion.div>
             </motion.div>
           </motion.div>
 
-          {/* Speed up animation after 2 seconds */}
+          {/* Speed up animation - faster spinning */}
           <motion.div
             className="absolute top-0 left-1/2 -translate-x-1/2"
             initial={{ rotate: 0 }}
             animate={{
-              rotate: [0, 360, 720, 1080, 1440, 1800, 2160],
+              rotate: [0, 360, 1080, 2160, 3600],
             }}
             transition={{
-              duration: 4,
-              times: [0, 0.3, 0.5, 0.65, 0.8, 0.9, 1],
-              ease: 'easeIn',
+              duration: 5,
+              times: [0, 0.2, 0.5, 0.75, 1],
+              ease: [0.25, 0.1, 0.25, 1],
             }}
             style={{ width: '100%', height: '100%' }}
           >
             <motion.div
               className="absolute top-0 left-1/2 -translate-x-1/2"
               animate={{
-                scale: [1, 1.5, 1.8, 2],
-                opacity: [1, 0.8, 0.6, 0],
+                scale: [1, 1.6, 2, 2.5],
+                opacity: [0.8, 0.6, 0.4, 0],
               }}
               transition={{
-                duration: 4,
+                duration: 5,
                 ease: 'easeIn',
               }}
             >
               <div
-                className="w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-300/40 blur-sm"
+                className="w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
+                style={{ backgroundColor: 'rgba(79, 70, 229, 0.4)' }}
               />
             </motion.div>
           </motion.div>
@@ -178,13 +233,42 @@ export default function LoadingScreen() {
         transition={{ delay: 0.5, duration: 0.5 }}
       >
         <motion.p
-          className="text-purple-400 text-lg font-light tracking-widest"
-          animate={{ opacity: [0.5, 1, 0.5] }}
+          className="text-lg font-light tracking-widest"
+          style={{ color: '#4F46E5' }}
+          animate={{ 
+            opacity: [0.5, 1, 0.5],
+          }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           LOADING
         </motion.p>
       </motion.div>
+
+      {/* Ambient particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full"
+            style={{
+              backgroundColor: '#4F46E5',
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -150, 0],
+              opacity: [0, 0.8, 0],
+              scale: [0, 1.5, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
     </motion.div>
   );
 }

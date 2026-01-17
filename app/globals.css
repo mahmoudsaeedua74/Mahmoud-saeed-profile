@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Brand Identity Colors */
+  --color-brand-primary: #4F46E5;
+  --color-brand-bg: #05070A;
+  --color-brand-title: #F8FAFC;
+  --color-brand-text: #94A3B8;
 }
 
 @media (prefers-color-scheme: dark) {

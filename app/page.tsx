@@ -12,7 +12,7 @@ export default function Home() {
     // Show loading screen for 5 seconds
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 50000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
