@@ -1,5 +1,4 @@
 'use client';
-
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useState } from 'react';
@@ -8,8 +7,8 @@ import { Github, Linkedin, Facebook, Mail, ArrowUpRight } from 'lucide-react';
 const roles = [
   { text: 'FRONTEND DEVELOPER', color: '#6366f1' },
   { text: 'BACKEND ARCHITECT', color: '#10b981' },
-  { text: 'CUSTOM THEME (ZID)', color: '#8b5cf6' },
-  { text: 'CUSTOM THEME (SALLA)', color: '#12b8a6' },
+  { text: 'ZID THEME SPECIALIST', color: '#8b5cf6' },
+  { text: 'SALLA THEME EXPERT', color: '#12b8a6' },
 ];
 
 const socials = [
@@ -24,60 +23,151 @@ export default function Hero() {
   const roleRef = useRef<HTMLDivElement>(null);
   const [roleIndex, setRoleIndex] = useState(0);
 
-  // 1. SIMPLIFIED Entrance Animation
+  // 1. Entrance Animation - Triggered after loading screen
   useGSAP(() => {
-    // Only animate the text elements that were working fine
-    // We removed the 'from' animation for socials/btn to force them to be visible by default
-    const tl = gsap.timeline({ delay: 5.5 });
+    // Hide elements IMMEDIATELY on mount
+    gsap.set('.hero-greeting span, .hero-name, .hero-sub-text, .hero-role-title, .hero-role-text, .hero-social-container, .hero-btn', {
+      opacity: 0
+    });
 
-    tl.from('.hero-greeting span', {
-      y: 60,
-      opacity: 0,
-      rotateX: -90,
-      stagger: 0.05,
-      duration: 1,
-      ease: 'power4.out',
-    })
-      .from('.hero-sub-text', {
-        x: -30,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      }, '-=0.4')
-      .from('.hero-role-section', {
-        y: 20,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      }, '-=0.4');
+    const startAnimation = () => {
+      const tl = gsap.timeline({ delay: 0.3 });
 
-    // Explicitly set opacity to 1 for safety, although they are visible by default now
-    gsap.set('.hero-social-item, .hero-btn', { opacity: 1, scale: 1, y: 0 });
+      // Smooth slide from LEFT for greeting text
+      tl.fromTo('.hero-greeting span', 
+        {
+          x: -100,
+          opacity: 0,
+        },
+        {
+          x: 0,
+          opacity: 1,
+          stagger: 0.08,
+          duration: 0.8,
+          ease: 'power3.out',
+        }
+      )
+        // Name animates the SAME WAY as greeting
+        .fromTo('.hero-name',
+          {
+            x: -100,
+            opacity: 0,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+          }, '-=0.4'
+        )
+        // Subtitle slides from left
+        .fromTo('.hero-sub-text',
+          {
+            x: -80,
+            opacity: 0,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out'
+          }, '-=0.5'
+        )
+        // Role TITLE slides from RIGHT
+        .fromTo('.hero-role-title',
+          {
+            x: 100,
+            opacity: 0,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power3.out'
+          }, '-=0.6'
+        )
+        // Role TEXT appears smoothly
+        .fromTo('.hero-role-text',
+          {
+            y: 20,
+            opacity: 0,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: 'power3.out'
+          }, '-=0.4'
+        )
+        // Social container (background + icons together) from right
+        .fromTo('.hero-social-container',
+          {
+            x: 80,
+            opacity: 0,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+          }, '-=0.5'
+        )
+        // CTA button slides from right
+        .fromTo('.hero-btn',
+          {
+            x: 60,
+            opacity: 0,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+          }, '-=0.5'
+        );
+    };
 
+    // Start animation after loading (5s) + overlap (0.8s)
+    const timer = setTimeout(() => {
+      startAnimation();
+    }, 5800);
+
+    // Add floating animation to decorative background
+    gsap.to('.hero-decorative-bg', {
+      y: 'random(-20, 20)',
+      x: 'random(-20, 20)',
+      duration: 'random(3, 5)',
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    });
+
+    return () => clearTimeout(timer);
   }, { scope: container });
 
-  // 2. Role rotation
+  // 2. Role rotation with smooth animation
   useGSAP(() => {
     const rotateRole = () => {
       const nextIndex = (roleIndex + 1) % roles.length;
 
+      // Smooth slide up and fade out
       gsap.to(roleRef.current, {
-        y: -15,
+        y: -30,
         opacity: 0,
-        filter: 'blur(10px)',
-        duration: 0.5,
-        ease: 'power2.in',
+        duration: 0.6,
+        ease: 'power3.in',
         onComplete: () => {
           setRoleIndex(nextIndex);
+          // Smooth slide down and fade in
           gsap.fromTo(roleRef.current,
-            { y: 15, opacity: 0, filter: 'blur(10px)' },
-            { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
           );
         }
       });
     };
 
-    const timer = setTimeout(rotateRole, 3000);
+    const timer = setTimeout(rotateRole, 2000); // Change every 2 seconds
     return () => clearTimeout(timer);
   }, [roleIndex]);
 
@@ -85,22 +175,20 @@ export default function Hero() {
     <section
       ref={container}
       id="hero"
-      // REMOVED 'overflow-hidden' and added 'min-h-[100vh]' to allow scrolling if needed
-      // Added 'flex-col' by default for mobile sanity
       className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 lg:px-24 pt-32 pb-24 relative z-10"
     >
       <div className="max-w-[1440px] w-full mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-16 md:gap-0">
 
         {/* Left Content Column */}
-        <div className="relative z-10 w-full md:w-[45%] flex flex-col items-center md:items-start text-center md:text-left space-y-12">
+        <div className="hero-section relative z-10 w-full md:w-[45%] flex flex-col items-center md:items-start text-center md:text-left space-y-12">
           {/* Decorative Background */}
-          <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 blur-[150px] rounded-full -z-10" />
+          <div className="hero-decorative-bg absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 blur-[150px] rounded-full -z-10" />
 
           <div className="hero-greeting head-1 uppercase font-black text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] flex flex-wrap gap-x-4 gap-y-2 justify-center md:justify-start">
             {"Hi, My Name Is".split(" ").map((word, idx) => (
               <span key={idx} className="inline-block whitespace-nowrap">{word}</span>
             ))}
-            <span className="text-indigo-500 block w-full mt-4 ">Mahmoud</span>
+            <span className="hero-name text-indigo-500 block w-full mt-4 ">Mahmoud</span>
           </div>
 
           <div className="hero-sub-text flex flex-col items-center md:items-start space-y-8 ">
@@ -122,15 +210,14 @@ export default function Hero() {
         <div className="w-full md:w-[50%] flex flex-col items-center md:items-end justify-start gap-12 md:gap-20">
 
           {/* Role Section */}
-          <div className="hero-role-section flex flex-col items-center md:items-end space-y-">
-            <h2 className="text-white font-bold uppercase tracking-[0.4rem]   text-3xl sm:text-4xl md:text-5xl lg:text-6xl select-none  leading-none text-center md:text-right">
+          <div className="flex flex-col items-center md:items-end space-y-4">
+            <h2 className="hero-role-title text-white font-bold uppercase tracking-[0.4rem] text-3xl sm:text-4xl md:text-5xl lg:text-6xl select-none leading-none text-center md:text-right">
               Working As
             </h2>
-            {/* Added styling to prevent overflow hiding issues here too if necessary, but kept hidden for role rotation */}
-            <div className="relative w-full flex items-center justify-center md:justify-end  overflow-hidden bg-white/5 md:bg-transparent rounded-2xl md:rounded-none px-4 md:px-0">
+            <div className="relative w-full flex items-center justify-center md:justify-end overflow-hidden bg-white/5 md:bg-transparent rounded-2xl md:rounded-none px-4 md:px-0 min-h-[60px]">
               <div
                 ref={roleRef}
-                className="text-3xl sm:text-4xl md:text-5xl  font-black whitespace-nowrap leading-none transition-colors duration-700 text-center md:text-right "
+                className="hero-role-text text-3xl sm:text-4xl md:text-5xl font-black whitespace-nowrap leading-none transition-colors duration-700 text-center md:text-right"
                 style={{ color: roles[roleIndex].color }}
               >
                 {roles[roleIndex].text}
@@ -138,34 +225,42 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Socials & CTA Area - NO ANIMATION HIDING */}
           <div className="relative z-30 flex flex-col items-center md:items-end gap-6 w-full">
-            {/* Social Grid */}
-            <div className="flex flex-wrap justify-center md:justify-end gap-5 p-6 rounded-[2.5rem] bg-slate-900/90 border border-white/10 backdrop-blur-2xl shadow-[0_25px_75px_rgba(0,0,0,0.6)] border-indigo-500/20">
+
+            {/* SOCIAL ICONS - Background and icons animate together */}
+            <div className="hero-social-container flex flex-wrap justify-center md:justify-end gap-4 p-5 rounded-[2.5rem] bg-slate-900/90 border border-white/10 backdrop-blur-2xl shadow-[0_25px_75px_rgba(0,0,0,0.6)] border-indigo-500/20">
               {socials.map((social, idx) => (
                 <a
                   key={idx}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hero-social-item cursor-target w-12 h-12 sm:w-14 sm:h-12 flex items-center justify-center rounded-2xl bg-white/[0.1] hover:bg-indigo-600 transition-all border border-white/10 hover:border-indigo-400/50 hover:-translate-y-2 lg:hover:scale-110 active:scale-90 group"
+                  className="cursor-target relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full text-slate-400 transition-all duration-300 hover:scale-125 group bg-white/[0.03]"
+                  style={{ '--hover-color': social.color } as any}
                   aria-label={social.href}
                 >
                   <social.icon
-                    size={32}
-                    color={social.color}
-                    className="sm:w-6 sm:h-6 transition-all group-hover:scale-110 group-hover:text-white"
+                    size={24}
+                    className="relative z-10 group-hover:text-[var(--hover-color)] transition-colors duration-300"
+                  />
+
+                  <span
+                    className="absolute inset-0 rounded-full border-2 border-indigo-500/0 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-120 group-hover:border-[var(--hover-color)] transition-all duration-500"
+                  />
+
+                  <span
+                    className="absolute inset-0 rounded-full bg-[var(--hover-color)] opacity-0 group-hover:opacity-10 transition-opacity duration-300"
                   />
                 </a>
               ))}
             </div>
 
-            {/* Principal CTA */}
+            {/* CTA Button */}
             <a
               href="mailto:mahmoudsaeed0112074@gmail.com"
               className="hero-btn cursor-target relative group px-12 py-6 sm:px-16 sm:py-8 rounded-2xl bg-indigo-600 overflow-hidden shadow-[0_25px_50px_rgba(79,70,229,0.4)] hover:shadow-[0_35px_70px_rgba(79,70,229,0.6)] transition-all hover:scale-[1.05] active:scale-[0.98] border border-indigo-400/20"
             >
-              <div className="relative z-10 text-white font-black text-lg sm:text-2xl  uppercase tracking-tighter flex items-center gap-5 ">
+              <div className="relative z-10 text-white font-black text-lg sm:text-2xl uppercase tracking-tighter flex items-center gap-5">
                 Say Hi !
                 <ArrowUpRight size={32} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </div>

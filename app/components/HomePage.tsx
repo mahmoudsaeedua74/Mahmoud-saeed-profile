@@ -1,7 +1,7 @@
 'use client';
 
 import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar'; // RESTORED
 import Background from './Background';
 import Hero from './sections/Hero';
 import About from './sections/About';
@@ -10,7 +10,7 @@ import Experience from './sections/Experience';
 import Testimonials from './sections/Testimonials';
 import Contact from './sections/Contact';
 
-import ContactButton from './ContactButton';
+import Chatbot from './Chatbot';
 
 export default function HomePage() {
   return (
@@ -21,11 +21,11 @@ export default function HomePage() {
       {/* Fixed Navbar - stays on top */}
       <Navbar />
 
-      {/* Fixed Sidebar - stays on left */}
+      {/* Scroll-Triggered Sidebar - Hidden in Hero, appears after */}
       <Sidebar />
 
-      {/* Floating Contact Button */}
-      <ContactButton />
+      {/* Floating Chatbot */}
+      <Chatbot />
 
       {/* Scrolling content */}
       <main className="relative z-10">
@@ -39,4 +39,3 @@ export default function HomePage() {
     </div>
   );
 }
-

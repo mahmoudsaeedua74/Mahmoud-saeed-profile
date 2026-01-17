@@ -11,31 +11,30 @@ export default function Home() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Show loading screen initially, then fade out
+    // Show loading screen initially, then fade out with smooth transition
     const timer = setTimeout(() => {
-      if (loadingOverlayRef.current) {
+      if (loadingOverlayRef.current && contentRef.current) {
         const tl = gsap.timeline({
           onComplete: () => {
             setIsLoading(false);
           }
         });
 
-        // 1. Fade out the loading overlay
+        // 1. Scale and fade out loading overlay with blur
         tl.to(loadingOverlayRef.current, {
           opacity: 0,
-          scale: 1.05,
-          duration: 1,
-          ease: 'power2.inOut',
+          scale: 1.1,
+          filter: 'blur(20px)',
+          duration: 1.2,
+          ease: 'power3.inOut',
         });
 
-        // 2. Simultaneously fade in the main content
-        if (contentRef.current) {
-          tl.to(contentRef.current, {
-            opacity: 1,
-            duration: 1,
-            ease: 'power2.out',
-          }, '-=0.5'); // Start slightly before the overlay is fully gone
-        }
+        // 2. Fade in main content smoothly
+        tl.to(contentRef.current, {
+          opacity: 1,
+          duration: 1,
+          ease: 'power2.out',
+        }, '-=0.8'); // Start before overlay fully fades
       } else {
         setIsLoading(false);
       }

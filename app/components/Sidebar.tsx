@@ -2,8 +2,12 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef, useState } from 'react';
 import { Github, Linkedin, Facebook, Instagram, Mail } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const socialLinks = [
   {
@@ -38,8 +42,6 @@ const socialLinks = [
   },
 ];
 
-import { usePathname } from 'next/navigation';
-
 export default function Sidebar() {
   const [activeTooltip, setActiveTooltip] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,62 +49,57 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   useGSAP(() => {
-    if (!listRef.current) return;
+    if (pathname === '/') {
+      // Initial Hidden State
+      gsap.set(containerRef.current, { x: -100, yPercent: -50, opacity: 0 });
 
-    // Entrance animation delay
-    const entranceDelay = pathname === '/' ? 5.5 : 0.5;
-    const tl = gsap.timeline({ delay: entranceDelay });
-
-    tl.fromTo(containerRef.current,
-      { x: -100, opacity: 0 },
-      {
+      // Show sidebar when user scrolls down 100px
+      ScrollTrigger.create({
+        start: 0,
+        end: 'max',
+        onUpdate: (self) => {
+          const scrollY = self.scroll();
+          if (scrollY > 200) {
+            // Show sidebar
+            gsap.to(containerRef.current, {
+              x: 0,
+              yPercent: -50,
+              opacity: 1,
+              duration: 0.5,
+              ease: 'power3.out',
+            });
+          } else {
+            // Hide sidebar
+            gsap.to(containerRef.current, {
+              x: -100,
+              yPercent: -50,
+              opacity: 0,
+              duration: 0.5,
+              ease: 'power3.in',
+            });
+          }
+        }
+      });
+    } else {
+      // On other pages, show immediately
+      gsap.set(containerRef.current, { x: -100, yPercent: -50, opacity: 0 });
+      gsap.to(containerRef.current, {
         x: 0,
+        yPercent: -50,
         opacity: 1,
         duration: 1,
+        delay: 0.5,
         ease: 'power3.out',
-      }
-    )
-      .from('.sidebar-icon-item', {
-        scale: 0,
-        rotate: -180,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'back.out(1.7)',
-      }, '-=0.5');
-  }, { scope: containerRef });
+      });
+    }
+  }, { scope: containerRef, dependencies: [pathname] });
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const { clientX, clientY } = e;
-    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    const x = (clientX - (left + width / 2)) / 5;
-    const y = (clientY - (top + height / 2)) / 5;
-
-    gsap.to(containerRef.current, {
-      x: x,
-      y: y,
-      duration: 0.5,
-      ease: 'power2.out',
-    });
-  };
-
-  const handleMouseLeave = () => {
-    gsap.to(containerRef.current, {
-      x: 0,
-      y: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    });
-    setActiveTooltip('');
-  };
 
   return (
     <div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="hidden sm:block fixed top-1/2 -translate-y-1/2 left-6 z-50"
+
+      className="hidden lg:block fixed top-1/2 left-6 z-50"
     >
       <div
         ref={listRef}
@@ -119,14 +116,14 @@ export default function Sidebar() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-target relative w-12 h-12 flex items-center justify-center rounded-full text-slate-400 transition-all duration-300 hover:scale-125"
+              className="cursor-target relative w-12 h-12 flex items-center justify-center rounded-full text-slate-400 transition-all duration-300 hover:scale-110"
               style={{ '--hover-color': color } as any}
             >
               <Icon size={24} className="relative z-10 group-hover:text-[var(--hover-color)] transition-colors duration-300" />
 
               {/* Outer glow ring */}
               <span
-                className="absolute inset-0 rounded-full border-2 border-indigo-500/0 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-120 group-hover:border-[var(--hover-color)] transition-all duration-500"
+                className="absolute inset-0 rounded-full border-2 border-indigo-500/0 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 group-hover:border-[var(--hover-color)] transition-all duration-500"
               />
 
               {/* Inner glow pulse */}
@@ -137,7 +134,7 @@ export default function Sidebar() {
 
             {/* Tooltip */}
             <div
-              className={`absolute left-full ml-5 px-3 py-1.5 rounded-lg text-white text-xs font-semibold tracking-wide whitespace-nowrap pointer-events-none transition-all duration-300 bg-slate-900/90 backdrop-blur-sm border border-indigo-500/30 shadow-2xl ${activeTooltip === href ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'
+              className={`absolute start-[110%] bottom-0 ms-5 mb-2 px-3 py-1.5 rounded-lg text-white text-xs font-semibold tracking-wide whitespace-nowrap pointer-events-none transition-all duration-300 bg-slate-900/90 backdrop-blur-sm border border-indigo-500/30 shadow-2xl ${activeTooltip === href ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'
                 }`}
             >
               {label}
