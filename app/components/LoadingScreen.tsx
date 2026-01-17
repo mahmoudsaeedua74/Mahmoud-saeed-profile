@@ -1,274 +1,132 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 
 export default function LoadingScreen() {
-  const [shakePhase, setShakePhase] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const orbitRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const particlesRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Trigger shake effect at 4 seconds
-    const timer = setTimeout(() => {
-      setShakePhase(true);
-    }, 4000);
+  useGSAP(() => {
+    const tl = gsap.timeline();
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Entrance
+    tl.from(logoRef.current, { scale: 0.8, opacity: 0, duration: 0.5, ease: 'power2.out' })
+      .from(textRef.current, { y: 20, opacity: 0, duration: 0.5 }, '-=0.2');
+
+    // Orbit animation
+    gsap.to(orbitRef.current, {
+      rotate: 360,
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+    });
+
+    // Pulse effect for dot
+    gsap.to(dotRef.current, {
+      scale: 1.15,
+      duration: 0.8,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    });
+
+    // Accelerated orbit and shake effect
+    tl.to(orbitRef.current, {
+      rotate: 3600,
+      duration: 5,
+      ease: 'power4.in',
+    }, 1);
+
+    tl.to(logoRef.current, {
+      x: 'random(-2, 2)',
+      y: 'random(-2, 2)',
+      rotate: 'random(-1, 1)',
+      duration: 0.1,
+      repeat: 20,
+      yoyo: true,
+      ease: 'none',
+    }, 4);
+
+    // Text pulse
+    gsap.to(textRef.current, {
+      opacity: 0.5,
+      duration: 1,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    });
+
+    // Particles creation and animation
+    const particleCount = 20;
+    for (let i = 0; i < particleCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'absolute w-1 h-1 rounded-full bg-indigo-500 opacity-0';
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.top = `${Math.random() * 100}%`;
+      particlesRef.current?.appendChild(p);
+
+      gsap.to(p, {
+        y: -150,
+        opacity: Math.random() * 0.8,
+        scale: 1.5,
+        duration: 2 + Math.random() * 2,
+        repeat: -1,
+        delay: Math.random() * 3,
+        ease: 'power1.inOut',
+      });
+    }
+  }, { scope: containerRef });
 
   return (
-    <motion.div
+    <div
+      ref={containerRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
     >
-      {/* 3D Perspective Container */}
       <div className="relative" style={{ perspective: '1000px' }}>
-        {/* Logo with shake animation */}
-        <motion.div
-          className="relative z-10"
-          animate={
-            shakePhase
-              ? {
-                  x: [0, -20, 25, -15, 20, -25, 15, -10, 0],
-                  y: [0, 15, -20, 25, -15, 20, -25, 15, 0],
-                  rotateZ: [0, -3, 4, -3, 2, -2, 3, -2, 0],
-                  scale: [1, 1.05, 0.95, 1.05, 0.95, 1.05, 0.95, 1],
-                }
-              : {}
-          }
-          transition={{
-            duration: 1,
-            ease: 'easeInOut',
-          }}
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="relative"
-          >
-            <Image
-              src="/logo2.png"
-              alt="Mahmoud Saeed Logo"
-              width={400}
-              height={400}
-              priority
-              className="rounded-lg "
-            
-            />
-          </motion.div>
-        </motion.div>
+        <div ref={logoRef} className="relative z-10">
+          <Image
+            src="/logo2.png"
+            alt="Mahmoud Saeed Logo"
+            width={400}
+            height={400}
+            priority
+            className="rounded-lg"
+          />
+        </div>
 
-        {/* Orbiting Dot with 3D effect */}
-        <motion.div
+        <div
+          ref={orbitRef}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
           style={{ width: '500px', height: '500px' }}
         >
-          {/* Orbit path visualization */}
-          <motion.div 
-            className="absolute inset-0 rounded-full border border-indigo-500/20"
-            animate={{
-              scale: [1, 1.05, 1],
-              opacity: [0.2, 0.3, 0.2],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-
-          {/* The animated dot - accelerating orbit */}
-          <motion.div
-            className="absolute top-0 left-1/2 -translate-x-1/2"
-            animate={{
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: 3,
-              ease: 'linear',
-              repeat: Infinity,
-            }}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <motion.div
-              className="absolute top-0 left-1/2 -translate-x-1/2"
-              animate={{
-                scale: [1, 1.4, 1],
-                y: [0, -25, 0],
-              }}
-              transition={{
-                duration: 3,
-                ease: 'easeInOut',
-                repeat: Infinity,
-              }}
-            >
-              {/* Glowing dot container */}
-              <motion.div
-                className="relative"
-                animate={{
-                  rotate: [0, -360],
-                }}
-                transition={{
-                  duration: 3,
-                  ease: 'linear',
-                  repeat: Infinity,
-                }}
-              >
-                {/* Outer glow - brand color */}
-                <motion.div 
-                  className="absolute inset-0 w-12 h-12 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl"
-                  style={{ backgroundColor: '#4F46E5' }}
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-                
-                {/* Middle glow */}
-                <motion.div 
-                  className="absolute inset-0 w-9 h-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
-                  style={{ backgroundColor: '#4F46E5' }}
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.6, 0.8, 0.6],
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-                
-                {/* Main dot - solid brand color */}
-                <motion.div
-                  className="w-8 h-8 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{
-                    backgroundColor: '#4F46E5',
-                    boxShadow: `
-                      0 0 15px #4F46E5,
-                      0 0 30px rgba(79, 70, 229, 0.7),
-                      0 0 45px rgba(79, 70, 229, 0.4)
-                    `,
-                  }}
-                  animate={{
-                    scale: [1, 1.15, 1],
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    ease: 'easeInOut',
-                    repeat: Infinity,
-                  }}
-                >
-                
-                </motion.div>
-
-                {/* Trail effect */}
-                <motion.div
-                  className="absolute top-0 left-0 w-5 h-5 -translate-x-1/2 -translate-y-1/2 rounded-full blur-sm"
-                  style={{ 
-                    marginLeft: '-15px',
-                    backgroundColor: '#4F46E5',
-                  }}
-                  animate={{
-                    opacity: [0.4, 0.2, 0.4],
-                    scale: [1, 0.8, 1],
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    repeat: Infinity,
-                  }}
-                />
-              </motion.div>
-            </motion.div>
-          </motion.div>
-
-          {/* Speed up animation - faster spinning */}
-          <motion.div
-            className="absolute top-0 left-1/2 -translate-x-1/2"
-            initial={{ rotate: 0 }}
-            animate={{
-              rotate: [0, 360, 1080, 2160, 3600],
-            }}
-            transition={{
-              duration: 5,
-              times: [0, 0.2, 0.5, 0.75, 1],
-              ease: [0.25, 0.1, 0.25, 1],
-            }}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <motion.div
-              className="absolute top-0 left-1/2 -translate-x-1/2"
-              animate={{
-                scale: [1, 1.6, 2, 2.5],
-                opacity: [0.8, 0.6, 0.4, 0],
-              }}
-              transition={{
-                duration: 5,
-                ease: 'easeIn',
-              }}
-            >
+          <div className="absolute inset-0 rounded-full border border-indigo-500/20" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2">
+            <div ref={dotRef} className="relative">
+              <div className="absolute inset-0 w-12 h-12 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl bg-indigo-600/30" />
+              <div className="absolute inset-0 w-9 h-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-md bg-indigo-600/60" />
               <div
-                className="w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
-                style={{ backgroundColor: 'rgba(79, 70, 229, 0.4)' }}
+                className="w-8 h-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600"
+                style={{ boxShadow: '0 0 15px #4F46E5, 0 0 30px rgba(79, 70, 229, 0.7)' }}
               />
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Loading text */}
-      <motion.div
-        className="absolute bottom-20 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <motion.p
-          className="text-lg font-light tracking-widest"
-          style={{ color: '#4F46E5' }}
-          animate={{ 
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
+      <div ref={textRef} className="absolute bottom-20 left-1/2 -translate-x-1/2">
+        <p className="text-lg font-light tracking-widest text-indigo-600">
           LOADING
-        </motion.p>
-      </motion.div>
-
-      {/* Ambient particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{
-              backgroundColor: '#4F46E5',
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -150, 0],
-              opacity: [0, 0.8, 0],
-              scale: [0, 1.5, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              delay: Math.random() * 3,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
+        </p>
       </div>
-    </motion.div>
+
+      <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none" />
+    </div>
   );
 }
