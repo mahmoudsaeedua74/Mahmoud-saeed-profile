@@ -4,7 +4,7 @@ import CodeAbout from '../CodeAbout';
 
 export default function About() {
   return (
-    <section id="about" className="min-h-screen py-20 px-4 md:px-8 relative z-10 w-full bg-black/20">
+    <section id="about" className="min-h-screen py-20 px-4 md:px-8 relative z-10 w-full ">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[800px] bg-indigo-600/5 blur-[120px] rounded-full -z-10" />
 

@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import Image from 'next/image';
 import { useRef } from 'react';
+import Background from './Background';
 
 export default function LoadingScreen() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -11,7 +12,6 @@ export default function LoadingScreen() {
   const orbitRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -62,34 +62,18 @@ export default function LoadingScreen() {
       yoyo: true,
       ease: 'sine.inOut',
     });
-
-    // Particles creation and animation
-    const particleCount = 20;
-    for (let i = 0; i < particleCount; i++) {
-      const p = document.createElement('div');
-      p.className = 'absolute w-1 h-1 rounded-full bg-indigo-500 opacity-0';
-      p.style.left = `${Math.random() * 100}%`;
-      p.style.top = `${Math.random() * 100}%`;
-      particlesRef.current?.appendChild(p);
-
-      gsap.to(p, {
-        y: -150,
-        opacity: Math.random() * 0.8,
-        scale: 1.5,
-        duration: 2 + Math.random() * 2,
-        repeat: -1,
-        delay: Math.random() * 3,
-        ease: 'power1.inOut',
-      });
-    }
   }, { scope: containerRef });
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
     >
-      <div className="relative" style={{ perspective: '1000px' }}>
+      {/* Same animated background */}
+      <Background />
+
+      {/* Loading content on top of background */}
+      <div className="relative z-10" style={{ perspective: '1000px' }}>
         <div ref={logoRef} className="relative z-10">
           <Image
             src="/logo2.png"
@@ -120,13 +104,11 @@ export default function LoadingScreen() {
         </div>
       </div>
 
-      <div ref={textRef} className="absolute bottom-20 left-1/2 -translate-x-1/2">
+      <div ref={textRef} className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10">
         <p className="text-lg font-light tracking-widest text-indigo-600">
           LOADING
         </p>
       </div>
-
-      <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none" />
     </div>
   );
 }

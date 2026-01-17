@@ -7,8 +7,8 @@ import { Github, Linkedin, Facebook, Mail, ArrowUpRight } from 'lucide-react';
 const roles = [
   { text: 'FRONTEND DEVELOPER', color: '#6366f1' },
   { text: 'BACKEND ARCHITECT', color: '#10b981' },
-  { text: 'ZID THEME SPECIALIST', color: '#8b5cf6' },
-  { text: 'SALLA THEME EXPERT', color: '#12b8a6' },
+  { text: 'CUSTOM THEME (ZID)', color: '#8b5cf6' },
+  { text: 'CUSTOM THEME (SALLA)', color: '#12b8a6' },
 ];
 
 const socials = [
@@ -25,16 +25,16 @@ export default function Hero() {
 
   // 1. Entrance Animation - Triggered after loading screen
   useGSAP(() => {
-    // Hide elements IMMEDIATELY on mount (including hero-name now!)
-    gsap.set('.hero-greeting-word, .hero-name, .hero-sub-text, .hero-role-title, .hero-role-text, .hero-social-container, .hero-btn', {
+    // Hide elements IMMEDIATELY on mount
+    gsap.set('.hero-greeting span, .hero-name, .hero-sub-text, .hero-role-section, .hero-social-container, .hero-btn', {
       opacity: 0
     });
 
     const startAnimation = () => {
       const tl = gsap.timeline({ delay: 0.3 });
 
-      // Smooth slide from LEFT for greeting words only (not the name)
-      tl.fromTo('.hero-greeting-word', 
+      // Smooth slide from LEFT for greeting text
+      tl.fromTo('.hero-greeting span', 
         {
           x: -100,
           opacity: 0,
@@ -47,7 +47,7 @@ export default function Hero() {
           ease: 'power3.out',
         }
       )
-        // Name animates separately with same style
+        // Name animates the SAME WAY as greeting
         .fromTo('.hero-name',
           {
             x: -100,
@@ -73,8 +73,8 @@ export default function Hero() {
             ease: 'power3.out'
           }, '-=0.5'
         )
-        // Role TITLE slides from RIGHT
-        .fromTo('.hero-role-title',
+        // Role section slides from RIGHT
+        .fromTo('.hero-role-section',
           {
             x: 100,
             opacity: 0,
@@ -85,19 +85,6 @@ export default function Hero() {
             duration: 0.9,
             ease: 'power3.out'
           }, '-=0.6'
-        )
-        // Role TEXT appears smoothly
-        .fromTo('.hero-role-text',
-          {
-            y: 20,
-            opacity: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: 'power3.out'
-          }, '-=0.4'
         )
         // Social container (background + icons together) from right
         .fromTo('.hero-social-container',
@@ -145,29 +132,28 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, { scope: container });
 
-  // 2. Role rotation with smooth animation
+  // 2. Role rotation
   useGSAP(() => {
     const rotateRole = () => {
       const nextIndex = (roleIndex + 1) % roles.length;
 
-      // Smooth slide up and fade out
       gsap.to(roleRef.current, {
-        y: -30,
+        y: -15,
         opacity: 0,
-        duration: 0.6,
-        ease: 'power3.in',
+        filter: 'blur(10px)',
+        duration: 0.5,
+        ease: 'power2.in',
         onComplete: () => {
           setRoleIndex(nextIndex);
-          // Smooth slide down and fade in
           gsap.fromTo(roleRef.current,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
+            { y: 15, opacity: 0, filter: 'blur(10px)' },
+            { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }
           );
         }
       });
     };
 
-    const timer = setTimeout(rotateRole, 2000); // Change every 2 seconds
+    const timer = setTimeout(rotateRole, 3000);
     return () => clearTimeout(timer);
   }, [roleIndex]);
 
@@ -184,22 +170,22 @@ export default function Hero() {
           {/* Decorative Background */}
           <div className="hero-decorative-bg absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 blur-[150px] rounded-full -z-10" />
 
-          <div className="hero-greeting head-1 uppercase font-black text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] flex flex-wrap gap-x-4 gap-y-2 justify-center md:justify-start">
+          <div className="hero-greeting head-1 uppercase font-bold text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] flex flex-wrap gap-x-4 gap-y-2 justify-center md:justify-start">
             {"Hi, My Name Is".split(" ").map((word, idx) => (
-              <span key={idx} className="hero-greeting-word inline-block whitespace-nowrap">{word}</span>
+              <span key={idx} className="inline-block whitespace-nowrap font-bold">{word}</span>
             ))}
-            <span className="hero-name text-indigo-500 block w-full mt-4">Mahmoud</span>
+            <span className="hero-name text-indigo-500 block w-full mt-4 font-bold ">Mahmoud</span>
           </div>
 
           <div className="hero-sub-text flex flex-col items-center md:items-start space-y-8 ">
             <div className="flex items-center gap-5 group">
               <div className="hidden md:block w-12 h-[3px] bg-indigo-500 group-hover:w-20 transition-all duration-500 rounded-full" />
-              <span className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold uppercase tracking-tighter leading-tight bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-transparent italic">
+              <span className="text-white font-medium  text-xl sm:text-2xl lg:text-3xl uppercase tracking-tighter leading-tight bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-transparent italic">
                 Develop Your Dream App Now
               </span>
             </div>
 
-            <div className="flex items-center gap-3 bg-slate-900/40 border border-slate-800/60 px-6 py-3 rounded-full hover:bg-slate-900/80 hover:border-indigo-500/30">
+            <div className="cursor-target flex items-center gap-3 bg-slate-900/40 border border-slate-800/60 px-6 py-3 rounded-full transition-all hover:bg-slate-900/80 hover:border-indigo-500/30">
               <div className="w-3 h-3 rounded-full bg-emerald-500 animate-[pulse_1.5s_infinite] shadow-[0_0_15px_#10b981]" />
               <span className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em]">Available For Projects</span>
             </div>
@@ -210,14 +196,14 @@ export default function Hero() {
         <div className="w-full md:w-[50%] flex flex-col items-center md:items-end justify-start gap-12 md:gap-20">
 
           {/* Role Section */}
-          <div className="flex flex-col items-center md:items-end space-y-4">
-            <h2 className="hero-role-title text-white font-bold uppercase tracking-[0.4rem] text-3xl sm:text-4xl md:text-5xl lg:text-6xl select-none leading-none text-center md:text-right">
+          <div className="hero-role-section flex flex-col items-center md:items-end space-y-4">
+            <h2 className="text-white f uppercase tracking-[0.4rem] font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl select-none leading-none text-center md:text-right">
               Working As
             </h2>
-            <div className="relative w-full flex items-center justify-center md:justify-end overflow-hidden bg-white/5 md:bg-transparent rounded-2xl md:rounded-none px-4 md:px-0 min-h-[60px]">
+            <div className="relative w-full flex items-center justify-center md:justify-end overflow-hidden bg-white/5 md:bg-transparent rounded-2xl md:rounded-none px-4 md:px-0">
               <div
                 ref={roleRef}
-                className="hero-role-text text-3xl sm:text-4xl md:text-5xl font-black whitespace-nowrap leading-none transition-colors duration-700 text-center md:text-right"
+                className="text-3xl font-bold sm:text-4xl md:text-5xl  whitespace-nowrap leading-none transition-colors duration-700 text-center md:text-right"
                 style={{ color: roles[roleIndex].color }}
               >
                 {roles[roleIndex].text}
