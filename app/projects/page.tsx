@@ -168,7 +168,162 @@ export default function ProjectsPage() {
     });
   }, [searchQuery, selectedTechFilters, selectedTypeFilters]);
 
-  // Animate filtered projects
+  // Page entrance animations
+  useGSAP(() => {
+    if (!containerRef.current) return;
+
+    const tl = gsap.timeline({ delay: 0.2 });
+
+    // Back button animation
+    const backButton = containerRef.current.previousElementSibling?.querySelector('button') || 
+                       document.querySelector('.fixed.top-8.left-8');
+    if (backButton) {
+      gsap.fromTo(backButton,
+        {
+          opacity: 0,
+          x: -30,
+          scale: 0.9,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: 'back.out(1.4)',
+        }
+      );
+    }
+
+    // Title animation - animate the SectionTitle component
+    const titleSection = containerRef.current.querySelector('.mb-12.text-center');
+    if (titleSection) {
+      const titleElement = titleSection.querySelector('.hidden.lg\\:flex');
+      const mobileTitle = titleSection.querySelector('h1');
+      
+      if (titleElement) {
+        tl.fromTo(titleElement,
+          {
+            opacity: 0,
+            y: -50,
+            scale: 0.95,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+          },
+          0
+        );
+      }
+      
+      if (mobileTitle) {
+        tl.fromTo(mobileTitle,
+          {
+            opacity: 0,
+            y: -30,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power3.out',
+          },
+          0
+        );
+      }
+    }
+
+    // Search container animation
+    const searchRef = containerRef.current.querySelector('.search-container');
+    if (searchRef) {
+      tl.fromTo(searchRef,
+        {
+          opacity: 0,
+          y: 20,
+          scale: 0.98,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: 'power3.out',
+        },
+        0.2
+      );
+    }
+
+    // Filters container animation
+    const filtersRef = containerRef.current.querySelector('.filters-container');
+    if (filtersRef) {
+      tl.fromTo(filtersRef,
+        {
+          opacity: 0,
+          y: 20,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.out',
+        },
+        0.4
+      );
+
+      // Animate filter buttons with stagger
+      const filterButtons = filtersRef.querySelectorAll('.filter-btn');
+      if (filterButtons.length > 0) {
+        tl.fromTo(filterButtons,
+          {
+            opacity: 0,
+            scale: 0.8,
+            y: 10,
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.03,
+            ease: 'back.out(1.2)',
+          },
+          0.5
+        );
+      }
+    }
+
+    // Projects grid animation
+    if (projectsGridRef.current) {
+      const projectCards = projectsGridRef.current.querySelectorAll('.project-card');
+      if (projectCards.length > 0) {
+        tl.fromTo(projectCards,
+          {
+            opacity: 0,
+            y: 40,
+            scale: 0.9,
+            rotationY: 15,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotationY: 0,
+            duration: 0.7,
+            stagger: {
+              amount: 0.6,
+              from: 'start',
+            },
+            ease: 'power3.out',
+          },
+          0.6
+        );
+      }
+    }
+  }, { scope: containerRef });
+
+  // Animate filtered projects when filters change
   useGSAP(() => {
     if (!projectsGridRef.current) return;
 
@@ -190,28 +345,6 @@ export default function ProjectsPage() {
       }
     );
   }, { scope: projectsGridRef, dependencies: [filteredProjects] });
-
-  // Initial animation on mount
-  useGSAP(() => {
-    if (!containerRef.current) return;
-
-    const searchRef = containerRef.current.querySelector('.search-container');
-    const filtersRef = containerRef.current.querySelector('.filters-container');
-
-    gsap.fromTo([searchRef, filtersRef],
-      {
-        opacity: 0,
-        y: -20,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power3.out',
-      }
-    );
-  }, { scope: containerRef });
 
   const toggleTechFilter = (filterId: string) => {
     setSelectedTechFilters(prev =>
@@ -243,13 +376,15 @@ export default function ProjectsPage() {
       className="min-h-screen bg-black text-white relative overflow-hidden"
     >
       {/* Back button */}
-      <button
-        onClick={() => router.back()}
-        className="fixed top-8 left-8 z-50 flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition-all group"
-      >
-        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-        <span className="text-sm font-medium">Back</span>
-      </button>
+      <div className="fixed top-8 left-8 z-50">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition-all group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-24 py-24 pt-32">

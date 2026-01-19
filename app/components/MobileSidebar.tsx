@@ -95,7 +95,7 @@ export default function MobileSidebar() {
 
   // Animate sidebar open/close
   useGSAP(() => {
-    if (!sidebarRef.current || !menuRef.current || isLoading) return;
+    if (!sidebarRef.current || !menuRef.current) return;
 
     if (isOpen) {
       // Open sidebar
@@ -234,18 +234,38 @@ export default function MobileSidebar() {
 
   return (
     <>
-      {/* Hamburger Menu Button - Only visible on mobile */}
-      <button
-        onClick={toggleSidebar}
-        className="lg:hidden fixed top-6 left-6 z-[6000] w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? (
-          <X size={24} className="text-white transition-transform rotate-90" />
-        ) : (
-          <Menu size={24} className="text-white" />
-        )}
-      </button>
+      {/* Hamburger Menu Button - Only visible on mobile, hidden during loading */}
+      {!isLoading && (
+        <button
+          ref={buttonRef}
+          onClick={toggleSidebar}
+          className="lg:hidden fixed top-6 left-6 z-[6000] group"
+          aria-label="Toggle menu"
+        >
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            {/* Outer glow ring */}
+            <div className="absolute inset-0 rounded-full bg-indigo-600/20 blur-xl group-hover:bg-indigo-600/30 transition-colors" />
+            
+            {/* Button background */}
+            <div className="relative w-full h-full rounded-full bg-black/40 backdrop-blur-xl border border-indigo-500/30 group-hover:border-indigo-500/50 transition-all group-hover:scale-110 flex items-center justify-center">
+              <div className="relative w-6 h-5 flex flex-col justify-between">
+                {isOpen ? (
+                  <>
+                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-white rotate-45 transition-transform" />
+                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-0.5 bg-white -rotate-45 transition-transform" />
+                  </>
+                ) : (
+                  <>
+                    <span className="w-full h-0.5 bg-white rounded-full transition-all group-hover:bg-indigo-400" />
+                    <span className="w-full h-0.5 bg-white rounded-full transition-all group-hover:bg-indigo-400" />
+                    <span className="w-full h-0.5 bg-white rounded-full transition-all group-hover:bg-indigo-400" />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </button>
+      )}
 
       {/* Overlay */}
       {isOpen && (
@@ -257,10 +277,10 @@ export default function MobileSidebar() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Background matches main background */}
       <div
         ref={sidebarRef}
-        className="lg:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] z-[5999] bg-gradient-to-b from-slate-900/95 via-slate-900/98 to-black backdrop-blur-xl border-r border-indigo-500/20 shadow-2xl"
+        className="lg:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] z-[5999] bg-black/95 backdrop-blur-xl border-r border-indigo-500/20 shadow-2xl"
         style={{ transform: 'translateX(-100%)' }}
       >
         <div ref={menuRef} className="flex flex-col h-full pt-24 pb-8 px-6 overflow-y-auto">
