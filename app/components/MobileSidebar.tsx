@@ -4,16 +4,16 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Github, Linkedin, Facebook, Instagram, Mail, Home } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Facebook, Instagram, Mail, Home, User, Briefcase, Award, MessageSquare, FolderOpen } from 'lucide-react';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Contact', href: '#contact' },
-  { name: 'All Projects', href: '/projects' },
+  { name: 'About', href: '#about', icon: User },
+  { name: 'Projects', href: '#projects', icon: FolderOpen },
+  { name: 'Experience', href: '#experience', icon: Briefcase },
+  { name: 'Testimonials', href: '#testimonials', icon: Award },
+  { name: 'Contact', href: '#contact', icon: MessageSquare },
+  { name: 'All Projects', href: '/projects', icon: FolderOpen },
 ];
 
 const socialLinks = [
@@ -285,16 +285,16 @@ export default function MobileSidebar() {
       >
         <div ref={menuRef} className="flex flex-col h-full pt-24 pb-8 px-6 overflow-y-auto">
           {/* Logo/Brand */}
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">
+          <div className="mb-8 text-center pb-6 border-b border-white/10">
+            <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">
               Portfolio
             </h2>
-            <div className="w-16 h-0.5 bg-indigo-500 mx-auto rounded-full" />
+            <p className="text-xs text-gray-400 uppercase tracking-wider">Mahmoud Saeed</p>
           </div>
 
           {/* Navigation Items */}
           <nav className="flex-1 mb-8">
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {navItems.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || (pathname === '/' && item.href.startsWith('#'));
@@ -303,14 +303,23 @@ export default function MobileSidebar() {
                   <li key={item.name} className="nav-item">
                     <button
                       onClick={() => handleClick(item.href)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-                        isActive
-                          ? 'bg-indigo-600/30 text-white border border-indigo-500/50'
-                          : 'text-gray-300 hover:bg-white/10 hover:text-white border border-transparent'
-                      }`}
+                      className="w-full text-left cursor-pointer group/nav"
                     >
-                      {Icon && <Icon size={20} className="flex-shrink-0" />}
-                      <span className="font-medium">{item.name}</span>
+                      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                        isActive
+                          ? 'text-white bg-white/5'
+                          : 'text-neutral-200 group-hover/nav:text-white group-hover/nav:bg-white/5'
+                      }`}>
+                        {Icon && (
+                          <Icon 
+                            size={18} 
+                            className={`shrink-0 transition-colors ${
+                              isActive ? 'text-indigo-400' : 'text-gray-400 group-hover/nav:text-indigo-400'
+                            }`} 
+                          />
+                        )}
+                        <span className="text-sm font-medium">{item.name}</span>
+                      </div>
                     </button>
                   </li>
                 );
@@ -318,12 +327,12 @@ export default function MobileSidebar() {
             </ul>
           </nav>
 
-          {/* Social Links */}
+          {/* Social Links - All in one line */}
           <div className="border-t border-white/10 pt-6">
             <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 text-center">
               Connect
             </h3>
-            <div className="flex justify-center items-center gap-4 flex-wrap">
+            <div className="flex justify-center items-center gap-3 flex-nowrap overflow-x-auto">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -332,11 +341,11 @@ export default function MobileSidebar() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="social-item w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all group"
+                    className="social-item flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all group"
                     style={{ '--hover-color': social.color } as any}
                   >
                     <Icon 
-                      size={20} 
+                      size={18} 
                       className="text-gray-400 group-hover:text-[var(--hover-color)] transition-colors" 
                     />
                   </a>

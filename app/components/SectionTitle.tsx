@@ -57,10 +57,14 @@ export default function SectionTitle({
       );
     }
 
-    // Title hover effects - ALWAYS set up, regardless of containerRef
+    // Title hover effects - Set up for both button and non-button (when no href)
     const titleButton = titleRef.current.querySelector('button') as HTMLElement;
+    const titleContainer = titleRef.current; // Container div that can also be hovered
     
-    if (titleButton && strokeTitle) {
+    // Use button if it exists, otherwise use the container div
+    const hoverTarget = titleButton || titleContainer;
+    
+    if (hoverTarget && strokeTitle) {
       const handleMouseEnter = () => {
         const hoverTl = gsap.timeline();
         
@@ -147,12 +151,12 @@ export default function SectionTitle({
         }, 0.2);
       };
 
-      titleButton.addEventListener('mouseenter', handleMouseEnter);
-      titleButton.addEventListener('mouseleave', handleMouseLeave);
+      hoverTarget.addEventListener('mouseenter', handleMouseEnter);
+      hoverTarget.addEventListener('mouseleave', handleMouseLeave);
 
       return () => {
-        titleButton.removeEventListener('mouseenter', handleMouseEnter);
-        titleButton.removeEventListener('mouseleave', handleMouseLeave);
+        hoverTarget.removeEventListener('mouseenter', handleMouseEnter);
+        hoverTarget.removeEventListener('mouseleave', handleMouseLeave);
       };
     }
   }, { scope: titleRef });
@@ -219,16 +223,42 @@ export default function SectionTitle({
           )}
         </button>
       ) : (
-        <h2 
-          className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-center pointer-events-none section-title-stroke transition-opacity duration-500"
-          style={{
-            WebkitTextStroke: '2px rgba(99, 102, 241, 0.4)',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
-          }}
-        >
-          {text}
-        </h2>
+        <div className="relative cursor-pointer">
+          {/* Background stroke text - DEFAULT: Always visible */}
+          <h2 
+            className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-center pointer-events-none section-title-stroke transition-opacity duration-500"
+            style={{
+              WebkitTextStroke: '2px rgba(99, 102, 241, 0.4)',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+            }}
+          >
+            {text}
+          </h2>
+          
+          {/* Foreground white text - Only visible on hover */}
+          <div 
+            className="absolute inset-0 flex justify-center items-center pointer-events-none section-title-white"
+            aria-hidden="true"
+            style={{ opacity: 0 }}
+          >
+            <span className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white flex">
+              {text.split('').map((letter, idx) => (
+                <span 
+                  key={idx}
+                  className="inline-block section-title-letter"
+                  style={{ 
+                    willChange: 'transform, opacity',
+                    opacity: 0,
+                    transform: 'translateY(20px)'
+                  }}
+                >
+                  {letter === ' ' ? '\u00A0' : letter}
+                </span>
+              ))}
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );

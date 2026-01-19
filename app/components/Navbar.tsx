@@ -20,8 +20,12 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    // Initial entrance - delay only on home page due to loading screen
-    const entranceDelay = pathname === '/' ? 5.5 : 0.5;
+    // Check if this is the first load (loading screen will delay)
+    const hasLoadedBefore = typeof window !== 'undefined' ? sessionStorage.getItem('hasLoadedBefore') : null;
+    
+    // Initial entrance - delay only on home page if it's the first load
+    const isFirstLoad = pathname === '/' && hasLoadedBefore !== 'true';
+    const entranceDelay = isFirstLoad ? 5.5 : 0.3;
 
     if (navRef.current) {
       gsap.fromTo(navRef.current,
@@ -29,7 +33,7 @@ export default function Navbar() {
         {
           y: 0,
           opacity: 1,
-          duration: 1,
+          duration: 0.8,
           delay: entranceDelay,
           ease: 'power3.out',
         }
@@ -74,7 +78,7 @@ export default function Navbar() {
   return (
     <nav
       ref={navRef}
-      className="hidden lg:flex fixed top-10 inset-x-0 mx-auto z-[5000] max-w-fit items-center justify-center space-x-4 px-10 py-5 rounded-xl border shadow-lg"
+      className="hidden lg:flex fixed top-10 inset-x-0 mx-auto z-[5000] max-w-fit items-center justify-center space-x-4 px-6 md:px-10 py-4 md:py-5 rounded-xl border shadow-lg"
       style={{
         backdropFilter: 'blur(16px) saturate(180%)',
         backgroundColor: 'rgba(17, 25, 40, 0.75)',
@@ -88,9 +92,9 @@ export default function Navbar() {
           onClick={(e) => handleClick(e, item.href)}
           className="cursor-target relative text-neutral-200 hover:text-white flex items-center space-x-1 cursor-pointer transition-colors group"
         >
-          <span className="text-sm font-medium">{item.name}</span>
+          <span className="text-xs md:text-sm font-medium">{item.name}</span>
           <span
-            className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-indigo-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 transform-gpuOrigin-left"
+            className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-indigo-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
             style={{ transformOrigin: 'left' }}
           />
         </a>

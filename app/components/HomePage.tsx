@@ -1,7 +1,6 @@
 'use client';
 
-import Navbar from './Navbar';
-import Sidebar from './Sidebar'; // RESTORED
+import Sidebar from './Sidebar';
 import Background from './Background';
 import Hero from './sections/Hero';
 import About from './sections/About';
@@ -17,9 +16,6 @@ export default function HomePage() {
     <div className="relative min-h-screen">
       {/* Global Background */}
       <Background />
-
-      {/* Fixed Navbar - stays on top */}
-      <Navbar />
 
       {/* Scroll-Triggered Sidebar - Hidden in Hero, appears after */}
       <Sidebar />

@@ -7,16 +7,33 @@ import HomePage from './components/HomePage';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const loadingOverlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Show loading screen initially, then fade out with smooth transition
+    // Check if we've already loaded before (in this session)
+    const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore');
+    
+    if (hasLoadedBefore === 'true') {
+      // Already loaded before, skip loading screen
+      setIsLoading(false);
+      setHasLoaded(true);
+      if (contentRef.current) {
+        gsap.set(contentRef.current, { opacity: 1 });
+      }
+      return;
+    }
+
+    // First time loading - show loading screen
     const timer = setTimeout(() => {
       if (loadingOverlayRef.current && contentRef.current) {
         const tl = gsap.timeline({
           onComplete: () => {
             setIsLoading(false);
+            setHasLoaded(true);
+            // Mark as loaded in session storage
+            sessionStorage.setItem('hasLoadedBefore', 'true');
           }
         });
 
@@ -37,6 +54,8 @@ export default function Home() {
         }, '-=0.8'); // Start before overlay fully fades
       } else {
         setIsLoading(false);
+        setHasLoaded(true);
+        sessionStorage.setItem('hasLoadedBefore', 'true');
       }
     }, 5000);
 
@@ -51,7 +70,7 @@ export default function Home() {
       */}
       <div
         ref={contentRef}
-        style={{ opacity: 0 }}
+        style={{ opacity: hasLoaded ? 1 : 0 }}
         className="w-full h-full"
       >
         <HomePage />
