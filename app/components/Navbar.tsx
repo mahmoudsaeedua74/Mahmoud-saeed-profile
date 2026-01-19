@@ -74,7 +74,7 @@ export default function Navbar() {
   return (
     <nav
       ref={navRef}
-      className="fixed top-10 inset-x-0 mx-auto z-[5000] flex max-w-fit md:min-w-[70vw] lg:min-w-fit items-center justify-center space-x-4 px-10 py-5 rounded-xl border shadow-lg"
+      className="hidden lg:flex fixed top-10 inset-x-0 mx-auto z-[5000] max-w-fit items-center justify-center space-x-4 px-10 py-5 rounded-xl border shadow-lg"
       style={{
         backdropFilter: 'blur(16px) saturate(180%)',
         backgroundColor: 'rgba(17, 25, 40, 0.75)',
