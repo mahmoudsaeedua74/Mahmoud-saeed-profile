@@ -51,15 +51,51 @@ const socialLinks = [
 
 export default function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
+  // Check if loading (only on home page)
+  useEffect(() => {
+    if (pathname === '/') {
+      // Home page has 5 second loading screen
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 6000); // Wait for loading to complete
+      return () => clearTimeout(timer);
+    } else {
+      setIsLoading(false);
+    }
+  }, [pathname]);
+
+  // Animate button entrance
+  useGSAP(() => {
+    if (!buttonRef.current || isLoading) return;
+    
+    gsap.fromTo(buttonRef.current,
+      {
+        opacity: 0,
+        scale: 0.8,
+        y: -20,
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.6,
+        delay: pathname === '/' ? 0.5 : 0,
+        ease: 'back.out(1.4)',
+      }
+    );
+  }, { scope: buttonRef, dependencies: [isLoading, pathname] });
+
   // Animate sidebar open/close
   useGSAP(() => {
-    if (!sidebarRef.current || !menuRef.current) return;
+    if (!sidebarRef.current || !menuRef.current || isLoading) return;
 
     if (isOpen) {
       // Open sidebar
