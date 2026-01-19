@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "./components/CustomCursor";
+import MobileSidebar from "./components/MobileSidebar";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} font-sans antialiased cursor-none`}
       >
         <CustomCursor />
+        <MobileSidebar />
         {children}
       </body>
     </html>

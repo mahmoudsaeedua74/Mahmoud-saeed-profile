@@ -1,0 +1,295 @@
+'use client';
+
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { useRef, useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, Github, Linkedin, Facebook, Instagram, Mail, Home } from 'lucide-react';
+
+const navItems = [
+  { name: 'Home', href: '/', icon: Home },
+  { name: 'About', href: '#about' },
+  { name: 'Projects', href: '#projects' },
+  { name: 'Experience', href: '#experience' },
+  { name: 'Testimonials', href: '#testimonials' },
+  { name: 'Contact', href: '#contact' },
+  { name: 'All Projects', href: '/projects' },
+];
+
+const socialLinks = [
+  {
+    icon: Github,
+    href: 'https://github.com/mahmoudsaeedua74',
+    label: 'GitHub',
+    color: '#F8FAFC',
+  },
+  {
+    icon: Linkedin,
+    href: 'https://www.linkedin.com/in/mahmoud-saeed-8890092b5/',
+    label: 'LinkedIn',
+    color: '#0A66C2',
+  },
+  {
+    icon: Facebook,
+    href: 'https://www.facebook.com/profile.php?id=100005360088833',
+    label: 'Facebook',
+    color: '#1877F2',
+  },
+  {
+    icon: Instagram,
+    href: 'https://www.instagram.com/mahmoud_sa3eed_/',
+    label: 'Instagram',
+    color: '#E4405F',
+  },
+  {
+    icon: Mail,
+    href: 'mailto:mahmoudsaeed0112074@gmail.com',
+    label: 'Email',
+    color: '#EA4335',
+  },
+];
+
+export default function MobileSidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Animate sidebar open/close
+  useGSAP(() => {
+    if (!sidebarRef.current || !menuRef.current) return;
+
+    if (isOpen) {
+      // Open sidebar
+      const tl = gsap.timeline();
+      
+      // Show overlay if it exists
+      if (overlayRef.current) {
+        tl.to(overlayRef.current, {
+          opacity: 1,
+          duration: 0.3,
+          ease: 'power2.out',
+        }, 0);
+      }
+      
+      // Slide in sidebar
+      tl.to(sidebarRef.current, {
+        x: 0,
+        duration: 0.4,
+        ease: 'power3.out',
+      }, 0.1);
+      
+      // Animate menu items
+      const navItems = menuRef.current.querySelectorAll('.nav-item');
+      if (navItems.length > 0) {
+        tl.fromTo(navItems,
+          {
+            opacity: 0,
+            x: -30,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.4,
+            stagger: 0.05,
+            ease: 'power3.out',
+          },
+          0.2
+        );
+      }
+      
+      // Animate social icons
+      const socialItems = menuRef.current.querySelectorAll('.social-item');
+      if (socialItems.length > 0) {
+        tl.fromTo(socialItems,
+          {
+            opacity: 0,
+            scale: 0.8,
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.3,
+            stagger: 0.05,
+            ease: 'back.out(1.4)',
+          },
+          0.4
+        );
+      }
+    } else {
+      // Close sidebar
+      const tl = gsap.timeline();
+      
+      // Hide menu items
+      const allItems = menuRef.current.querySelectorAll('.nav-item, .social-item');
+      if (allItems.length > 0) {
+        tl.to(allItems, {
+          opacity: 0,
+          duration: 0.2,
+          ease: 'power2.in',
+        }, 0);
+      }
+      
+      // Slide out sidebar
+      tl.to(sidebarRef.current, {
+        x: '-100%',
+        duration: 0.4,
+        ease: 'power3.in',
+      }, 0.1);
+      
+      // Hide overlay if it exists
+      if (overlayRef.current) {
+        tl.to(overlayRef.current, {
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power2.in',
+        }, 0.1);
+      }
+    }
+  }, { scope: sidebarRef, dependencies: [isOpen] });
+
+  // Prevent body scroll when sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  const handleClick = (href: string) => {
+    if (href.startsWith('#')) {
+      // Scroll to section on same page
+      if (pathname === '/') {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setIsOpen(false);
+        }
+      } else {
+        // Navigate to home page then scroll
+        router.push(`/${href}`);
+        setIsOpen(false);
+      }
+    } else {
+      // Navigate to different page
+      router.push(href);
+      setIsOpen(false);
+    }
+  };
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      {/* Hamburger Menu Button - Only visible on mobile */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-6 left-6 z-[6000] w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
+        aria-label="Toggle menu"
+      >
+        {isOpen ? (
+          <X size={24} className="text-white transition-transform rotate-90" />
+        ) : (
+          <Menu size={24} className="text-white" />
+        )}
+      </button>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          ref={overlayRef}
+          onClick={closeSidebar}
+          className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[5998] opacity-0"
+          style={{ opacity: 0 }}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        ref={sidebarRef}
+        className="lg:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] z-[5999] bg-gradient-to-b from-slate-900/95 via-slate-900/98 to-black backdrop-blur-xl border-r border-indigo-500/20 shadow-2xl"
+        style={{ transform: 'translateX(-100%)' }}
+      >
+        <div ref={menuRef} className="flex flex-col h-full pt-24 pb-8 px-6 overflow-y-auto">
+          {/* Logo/Brand */}
+          <div className="mb-12 text-center">
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">
+              Portfolio
+            </h2>
+            <div className="w-16 h-0.5 bg-indigo-500 mx-auto rounded-full" />
+          </div>
+
+          {/* Navigation Items */}
+          <nav className="flex-1 mb-8">
+            <ul className="space-y-2">
+              {navItems.map((item, index) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || (pathname === '/' && item.href.startsWith('#'));
+                
+                return (
+                  <li key={item.name} className="nav-item">
+                    <button
+                      onClick={() => handleClick(item.href)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+                        isActive
+                          ? 'bg-indigo-600/30 text-white border border-indigo-500/50'
+                          : 'text-gray-300 hover:bg-white/10 hover:text-white border border-transparent'
+                      }`}
+                    >
+                      {Icon && <Icon size={20} className="flex-shrink-0" />}
+                      <span className="font-medium">{item.name}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* Social Links */}
+          <div className="border-t border-white/10 pt-6">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 text-center">
+              Connect
+            </h3>
+            <div className="flex justify-center items-center gap-4 flex-wrap">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.href}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-item w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all group"
+                    style={{ '--hover-color': social.color } as any}
+                  >
+                    <Icon 
+                      size={20} 
+                      className="text-gray-400 group-hover:text-[var(--hover-color)] transition-colors" 
+                    />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

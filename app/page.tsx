@@ -61,7 +61,7 @@ export default function Home() {
       {isLoading && (
         <div
           ref={loadingOverlayRef}
-          className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
+          className="fixed inset-0 z-50 bg-black flex items-center justify-center"
         >
           <LoadingScreen />
         </div>

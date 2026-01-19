@@ -2,7 +2,7 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useState } from 'react';
-import { Github, Linkedin, Facebook, Mail, ArrowUpRight } from 'lucide-react';
+import { Github, Linkedin, Facebook, Mail, ArrowUpRight, ChevronDown } from 'lucide-react';
 
 const roles = [
   { text: 'FRONTEND DEVELOPER', color: '#6366f1' },
@@ -34,7 +34,7 @@ export default function Hero() {
       const tl = gsap.timeline({ delay: 0.3 });
 
       // Smooth slide from LEFT for greeting text
-      tl.fromTo('.hero-greeting span', 
+      tl.fromTo('.hero-greeting span:not(.hero-name)',
         {
           x: -100,
           opacity: 0,
@@ -161,7 +161,7 @@ export default function Hero() {
     <section
       ref={container}
       id="hero"
-      className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 lg:px-24 pt-32 pb-24 relative z-10"
+      className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 lg:px-24 pt-32 pb-8 md:pb-16 relative z-10"
     >
       <div className="max-w-[1440px] w-full mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-16 md:gap-0">
 
@@ -174,7 +174,7 @@ export default function Hero() {
             {"Hi, My Name Is".split(" ").map((word, idx) => (
               <span key={idx} className="inline-block whitespace-nowrap font-bold">{word}</span>
             ))}
-            <span className="hero-name text-indigo-500 block w-full mt-4 font-bold ">Mahmoud</span>
+            <span className="hero-name text-indigo-500 block w-full mt-4 font-bold">Mahmoud</span>
           </div>
 
           <div className="hero-sub-text flex flex-col items-center md:items-start space-y-8 ">
@@ -255,6 +255,69 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      {/* Scroll to Projects Button */}
+      <ScrollToProjects />
     </section>
+  );
+}
+
+// Scroll to Projects Button Component
+function ScrollToProjects() {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const scrollToProjects = () => {
+    const projectsSection = document.getElementById('projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  useGSAP(() => {
+    if (!buttonRef.current) return;
+
+    // Animate button entrance after hero content
+    gsap.fromTo(buttonRef.current,
+      {
+        opacity: 0,
+        y: 20,
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        delay: 1.5, // After hero animations
+        ease: 'power3.out',
+      }
+    );
+
+    // Continuous bounce animation
+    gsap.to(buttonRef.current.querySelector('.scroll-icon'), {
+      y: 8,
+      duration: 1.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power2.inOut',
+    });
+  }, { scope: buttonRef });
+
+  return (
+    <button
+      ref={buttonRef}
+      onClick={scrollToProjects}
+      className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 group cursor-pointer touch-manipulation"
+      aria-label="Scroll to projects"
+      style={{ opacity: 0 }}
+    >
+      <span className="text-white/70 text-[10px] sm:text-xs uppercase tracking-wider font-medium group-hover:text-white transition-colors">
+        Scroll to see more
+      </span>
+      <div className="scroll-icon w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white/50 group-hover:border-white/90 flex items-center justify-center transition-all group-hover:bg-white/10 backdrop-blur-sm active:scale-95">
+        <ChevronDown size={18} className="md:w-5 md:h-5 text-white/70 group-hover:text-white transition-colors" />
+      </div>
+    </button>
   );
 }

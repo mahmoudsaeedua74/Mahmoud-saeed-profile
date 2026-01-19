@@ -30,8 +30,8 @@ export default function HomePage() {
       {/* Scrolling content */}
       <main className="relative z-10">
         <Hero />
-        <About />
         <Projects />
+        <About />
         <Experience />
         <Testimonials />
         <Contact />

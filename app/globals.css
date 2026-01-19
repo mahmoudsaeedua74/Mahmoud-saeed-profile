@@ -26,10 +26,53 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-jakarta);
   overflow-x: hidden;
+}
+
+/* Bouncing arrow animation */
+@keyframes bounce-arrow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.bouncing-arrow {
+  animation: bounce-arrow 2s ease-in-out infinite;
+}
+
+/* Scroll hint animation */
+.scroll-hint {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-hint:hover {
+  opacity: 1;
+}
+
+/* Filter button animations */
+.filter-btn-active {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Smooth transitions for filter buttons */
+.filter-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-btn:hover {
+  transform: translateY(-2px);
 }
 
