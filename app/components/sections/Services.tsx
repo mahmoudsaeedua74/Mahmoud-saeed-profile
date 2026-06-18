@@ -4,8 +4,9 @@ import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Code2, Layers, Palette, Server, ShoppingBag, Smartphone, ExternalLink } from 'lucide-react';
-import { Reveal, RevealText } from '../anim';
+import { Layers, Plug, Rocket, Server, ShoppingBag, Smartphone, ExternalLink } from 'lucide-react';
+import { Reveal } from '../anim';
+import SectionTitle from '../SectionTitle';
 import { STORES_SITE_URL } from '@/lib/site';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -29,17 +30,17 @@ const services = [
   {
     icon: ShoppingBag,
     title: 'Zid & Salla Themes',
-    desc: 'Custom storefronts optimized for conversion on Saudi platforms.',
+    desc: 'Custom storefronts, theme setup, CSS tweaks, and SDK work on Saudi platforms.',
   },
   {
-    icon: Palette,
-    title: 'UI & Motion',
-    desc: 'GSAP scroll experiences, micro-interactions, and polished design.',
+    icon: Plug,
+    title: 'Custom Integrations',
+    desc: 'Payments, shipping, CRM, webhooks, and third-party tools connected to your product or store.',
   },
   {
-    icon: Code2,
-    title: 'Code Quality',
-    desc: 'Clean architecture, reusable components, and maintainable codebases.',
+    icon: Rocket,
+    title: 'Launch & Support',
+    desc: 'Deployment, hosting, bug fixes, and post-launch updates so everything stays running.',
   },
 ];
 
@@ -106,13 +107,14 @@ export default function Services() {
               What I Do
             </span>
           </Reveal>
-          <RevealText
-            text="Services & Skills"
-            as="h2"
-            className="text-3xl font-black uppercase tracking-tighter text-white md:text-5xl"
+          <SectionTitle
+            text="SERVICES & SKILLS"
+            mobileText="Services & Skills"
+            containerRef={sectionRef}
           />
-          <Reveal className="mx-auto mt-4 max-w-xl text-slate-400" delay={0.15}>
-            Full-stack capabilities tailored for startups, agencies, and e-commerce brands.
+          <Reveal className="mx-auto mt-4 max-w-2xl text-slate-400" delay={0.15}>
+            Full-stack, frontend-only, backend-only, or Zid &amp; Salla — hire me for the scope
+            your project actually needs.
           </Reveal>
         </div>
 
