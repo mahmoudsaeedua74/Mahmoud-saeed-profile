@@ -12,6 +12,7 @@ import ProjectGridCard from '../components/ProjectGridCard';
 import StoreProjectCard from '../components/store/StoreProjectCard';
 import SectionDivider from '../components/SectionDivider';
 import { Reveal, RevealText } from '../components/anim';
+import SectionTitle from '../components/SectionTitle';
 import {
   projectCategories,
   projects,
@@ -269,10 +270,10 @@ export default function ProjectsPage() {
                 Full Portfolio
               </span>
             </Reveal>
-            <RevealText
-              text="My Work"
-              as="h2"
-              className="text-3xl font-black uppercase tracking-tighter md:text-5xl"
+            <SectionTitle
+              text="MY WORK"
+              mobileText="My Work"
+              containerRef={pageRef}
             />
             <Reveal className="mx-auto mt-4 max-w-xl text-slate-400" delay={0.12}>
               Filter by specialty and dive into the details of each build.

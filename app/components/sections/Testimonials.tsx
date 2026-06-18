@@ -2,7 +2,8 @@
 
 import { Star, Quote } from 'lucide-react';
 import InfiniteMarquee from '../InfiniteMarquee';
-import { Reveal, RevealText } from '../anim';
+import { Reveal } from '../anim';
+import SectionTitle from '../SectionTitle';
 import {
   testimonialRowA,
   testimonialRowB,
@@ -44,10 +45,9 @@ export default function Testimonials() {
               Testimonials
             </span>
           </Reveal>
-          <RevealText
-            text="What Clients Say"
-            as="h2"
-            className="text-3xl font-black uppercase tracking-tighter text-white md:text-5xl"
+          <SectionTitle
+            text="WHAT CLIENTS SAY"
+            mobileText="What Clients Say"
           />
         </div>
       </div>

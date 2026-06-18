@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Loader2 } from 'lucide-react';
 import { FormEvent, useRef, useState } from 'react';
+import SectionTitle from './SectionTitle';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -112,6 +113,14 @@ export default function ContactSection() {
       className="relative z-10 border-t border-white/10 bg-gradient-to-b from-[#0f172a] to-black py-20 md:py-28"
     >
       <div className="page-container">
+        <div className="mb-12 text-center md:mb-16">
+          <SectionTitle
+            text="CONTACT"
+            mobileText="Contact"
+            containerRef={sectionRef}
+          />
+        </div>
+
         <div className="flex w-full flex-col gap-14 lg:flex-row lg:items-start lg:gap-20">
           {/* Info */}
           <div

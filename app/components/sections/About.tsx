@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import CodeAbout from '../CodeAbout';
-import { RevealText } from '../anim';
+import SectionTitle from '../SectionTitle';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -62,11 +62,12 @@ export default function About() {
       <div className="about-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[800px] bg-indigo-600/5 blur-[120px] rounded-full -z-10" />
 
       <div className="page-container">
-        <div className="mb-12 md:mb-20 text-center">
-          <RevealText
-            text="About Me"
-            as="h2"
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 font-['Belgrano']"
+        <div className="mb-12 text-center md:mb-20">
+          <SectionTitle
+            text="ABOUT ME"
+            mobileText="About Me"
+            containerRef={sectionRef}
+            className="mb-4"
           />
           <div
             ref={lineRef}

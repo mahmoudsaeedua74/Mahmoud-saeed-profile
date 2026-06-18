@@ -26,7 +26,8 @@ import {
 } from 'react-icons/si';
 import { TbBrandFramerMotion } from 'react-icons/tb';
 import InfiniteMarquee from '../InfiniteMarquee';
-import { Reveal, RevealText } from '../anim';
+import { Reveal } from '../anim';
+import SectionTitle from '../SectionTitle';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -109,10 +110,10 @@ export default function TechnicalSkills() {
               Tech Stack
             </span>
           </Reveal>
-          <RevealText
-            text="Technical Skills"
-            as="h2"
-            className="text-3xl font-black uppercase tracking-tighter text-white md:text-5xl"
+          <SectionTitle
+            text="TECHNICAL SKILLS"
+            mobileText="Technical Skills"
+            containerRef={sectionRef}
           />
           <Reveal className="mx-auto mt-4 max-w-xl text-slate-400" delay={0.12}>
             Tools and technologies I use to ship fast, scalable, and polished products.

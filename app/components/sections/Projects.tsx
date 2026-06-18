@@ -116,12 +116,9 @@ export default function Projects() {
         <div className="pointer-events-auto w-full">
           <SectionTitle
             text="PROJECTS"
-            href="/projects"
+            mobileText="Projects"
             containerRef={root}
           />
-          <h2 className="lg:hidden text-4xl md:text-6xl font-black text-white text-center uppercase tracking-tighter">
-            Projects
-          </h2>
         </div>
       </div>
 

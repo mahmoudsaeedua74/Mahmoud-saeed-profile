@@ -5,7 +5,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { timelineItems, type TimelineItem } from '@/app/data/timeline';
-import { Reveal, RevealText } from '../anim';
+import { Reveal } from '../anim';
+import SectionTitle from '../SectionTitle';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -117,10 +118,10 @@ export default function StoryTimeline() {
               My Journey
             </span>
           </Reveal>
-          <RevealText
-            text="How I Got Here"
-            as="h2"
-            className="text-[30px] font-extrabold leading-tight text-white sm:text-[40px]"
+          <SectionTitle
+            text="HOW I GOT HERE"
+            mobileText="How I Got Here"
+            containerRef={root}
           />
           <Reveal className="mt-3.5 text-[16px] text-slate-400 sm:text-[17px]" delay={0.12}>
             From self-taught foundations to full-stack delivery for startups, agencies, and
