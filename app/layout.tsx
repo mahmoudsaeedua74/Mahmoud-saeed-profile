@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "./components/CustomCursor";
-import MobileSidebar from "./components/MobileSidebar";
-import Navbar from "./components/Navbar";
+import HashScroll from "./components/HashScroll";
+import Header from "./components/Header";
 import ScrollProgress from "./components/ScrollProgress";
 import SmoothScroll from "./components/SmoothScroll";
 
@@ -32,8 +32,8 @@ export default function RootLayout({
         <SmoothScroll />
         <ScrollProgress />
         <CustomCursor />
-        <Navbar />
-        <MobileSidebar />
+        <Header />
+        <HashScroll />
         {children}
       </body>
     </html>

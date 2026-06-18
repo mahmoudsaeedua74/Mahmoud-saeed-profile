@@ -3,7 +3,6 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef } from 'react';
-import Navbar from '../components/Navbar';
 import Background from '../components/Background';
 
 export default function ContactPage() {
@@ -22,7 +21,6 @@ export default function ContactPage() {
     return (
         <div className="relative min-h-screen">
             <Background />
-            <Navbar />
 
             <main ref={containerRef} className="relative z-10 pt-40 px-6 max-w-5xl mx-auto">
                 <h1 className="contact-animate text-6xl md:text-8xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent mb-12">

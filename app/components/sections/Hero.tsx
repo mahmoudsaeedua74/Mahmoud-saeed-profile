@@ -1,10 +1,16 @@
 'use client';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useRef, useState } from 'react';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import { Github, Linkedin, Facebook, Mail, ArrowUpRight, ChevronDown } from 'lucide-react';
 import Magnetic from '../Magnetic';
 import { getLenis } from '@/lib/lenis';
+import { INTRO_DONE_EVENT, isIntroDone } from '@/lib/intro';
+
+function subscribeIntroDone(onStoreChange: () => void) {
+  window.addEventListener(INTRO_DONE_EVENT, onStoreChange);
+  return () => window.removeEventListener(INTRO_DONE_EVENT, onStoreChange);
+}
 
 const roles = [
   { text: 'FRONTEND DEVELOPER', color: '#6366f1' },
@@ -24,8 +30,11 @@ export default function Hero() {
   const container = useRef<HTMLDivElement>(null);
   const roleRef = useRef<HTMLDivElement>(null);
   const [roleIndex, setRoleIndex] = useState(0);
+  const played = useRef(false);
 
-  // 1. Entrance Animation - Triggered after loading screen
+  const introDone = useSyncExternalStore(subscribeIntroDone, isIntroDone, () => false);
+
+  // 1. Entrance Animation - triggered after loading screen
   useGSAP(() => {
     // Hide elements IMMEDIATELY on mount
     gsap.set('.hero-greeting span, .hero-name, .hero-sub-text, .hero-role-section, .hero-social-container, .hero-btn', {
@@ -33,6 +42,9 @@ export default function Hero() {
     });
 
     const startAnimation = () => {
+      if (played.current) return;
+      played.current = true;
+
       const tl = gsap.timeline({ delay: 0.3 });
 
       // Smooth slide from LEFT for greeting text
@@ -116,10 +128,9 @@ export default function Hero() {
         );
     };
 
-    // Start animation after loading (5s) + overlap (0.8s)
-    const timer = setTimeout(() => {
+    if (introDone) {
       startAnimation();
-    }, 5800);
+    }
 
     // Add floating animation to decorative background
     gsap.to('.hero-decorative-bg', {
@@ -198,10 +209,9 @@ export default function Hero() {
     });
 
     return () => {
-      clearTimeout(timer);
       mm.revert();
     };
-  }, { scope: container });
+  }, { scope: container, dependencies: [introDone] });
 
   // 2. Role rotation
   useGSAP(() => {
