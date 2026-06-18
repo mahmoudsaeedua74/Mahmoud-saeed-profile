@@ -3,582 +3,347 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useRef, useState, useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Search, X, Code2, ShoppingCart, MessageSquare, Layers, Globe, Rocket } from 'lucide-react';
-import SectionTitle from '../components/SectionTitle';
+import { ArrowLeft, ChevronDown, Sparkles } from 'lucide-react';
+import Background from '../components/Background';
+import ContactSection from '../components/ContactSection';
+import ProjectGridCard from '../components/ProjectGridCard';
+import StoreProjectCard from '../components/store/StoreProjectCard';
+import SectionDivider from '../components/SectionDivider';
+import { Reveal, RevealText } from '../components/anim';
+import {
+  projectCategories,
+  projects,
+  type ProjectCategory,
+} from '@/app/data/projects';
+import {
+  filterStoreProjects,
+  storeWorkFilters,
+  type StoreWorkFilter,
+} from '@/app/data/store-projects';
 
-gsap.registerPlugin(ScrollTrigger);
-
-// Extended project data structure
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  image: string;
-  color: string;
-  description: string;
-  technologies: string[];
-  projectType: string;
-}
-
-const projects: Project[] = [
-  {
-    id: '1',
-    title: 'Dr. Games',
-    slug: 'drgames',
-    image: '/houses1.png',
-    color: '#6366f1',
-    description: 'Advanced Hybrid Gaming Marketplace',
-    technologies: ['React', 'Next.js', 'TypeScript', 'Tailwind'],
-    projectType: 'SaaS'
-  },
-  {
-    id: '2',
-    title: 'Crawleo',
-    slug: 'crawleo',
-    image: '/houses1.png',
-    color: '#10b981',
-    description: 'Real-Time Web Intelligence API',
-    technologies: ['React', 'Next.js', 'TypeScript'],
-    projectType: 'SaaS'
-  },
-  {
-    id: '3',
-    title: 'Invia',
-    slug: 'invia',
-    image: '/houses1.png',
-    color: '#8b5cf6',
-    description: 'Modern Logistics Platform',
-    technologies: ['React', 'Next.js', 'TypeScript', 'Tailwind'],
-    projectType: 'ERP System'
-  },
-  {
-    id: '4',
-    title: '360 Home Offers',
-    slug: '360homeoffers',
-    image: '/houses1.png',
-    color: '#f59e0b',
-    description: 'Real Estate Platform Redesign',
-    technologies: ['React', 'Next.js', 'Tailwind'],
-    projectType: 'Landing Page'
-  },
-  {
-    id: '5',
-    title: 'Crettiva',
-    slug: 'crettiva',
-    image: '/houses1.png',
-    color: '#ec4899',
-    description: 'Digital Agency Portfolio',
-    technologies: ['React', 'Next.js', 'TypeScript', 'Tailwind'],
-    projectType: 'Landing Page'
-  },
-  {
-    id: '6',
-    title: 'Movie-Boi',
-    slug: 'movie-boi-react-imdb-netflex-clone',
-    image: '/houses1.png',
-    color: '#ef4444',
-    description: 'React-IMDB-Netflix Clone',
-    technologies: ['React', 'JavaScript', 'CSS'],
-    projectType: 'SaaS'
-  },
-  {
-    id: '7',
-    title: 'Al Manara',
-    slug: 'almenara-furniture-transfer',
-    image: '/houses1.png',
-    color: '#06b6d4',
-    description: 'E-commerce Furniture Platform',
-    technologies: ['SALLA', 'HTML', 'CSS', 'JavaScript'],
-    projectType: 'E-commerce'
-  },
-  {
-    id: '8',
-    title: "A'atene",
-    slug: 'aatene-ecommerce',
-    image: '/houses1.png',
-    color: '#14b8a6',
-    description: 'E-commerce Platform',
-    technologies: ['ZID', 'HTML', 'CSS', 'JavaScript'],
-    projectType: 'E-commerce'
-  },
-];
-
-// Filter options
-const technologyFilters = [
-  { id: 'html', label: 'HTML', icon: Code2 },
-  { id: 'css', label: 'CSS', icon: Code2 },
-  { id: 'js', label: 'JavaScript', icon: Code2 },
-  { id: 'ts', label: 'TypeScript', icon: Code2 },
-  { id: 'tailwind', label: 'Tailwind', icon: Code2 },
-  { id: 'react', label: 'React', icon: Code2 },
-  { id: 'next', label: 'Next.js', icon: Code2 },
-  { id: 'zid', label: 'ZID', icon: ShoppingCart },
-  { id: 'salla', label: 'SALLA', icon: ShoppingCart },
-];
-
-const projectTypeFilters = [
-  { id: 'ecommerce', label: 'E-commerce', icon: ShoppingCart },
-  { id: 'landingpage', label: 'Landing Page', icon: Globe },
-  { id: 'erp', label: 'ERP System', icon: Layers },
-  { id: 'chatbot', label: 'Chat Bot', icon: MessageSquare },
-  { id: 'saas', label: 'SaaS', icon: Rocket },
-];
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export default function ProjectsPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const projectsGridRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTechFilters, setSelectedTechFilters] = useState<string[]>([]);
-  const [selectedTypeFilters, setSelectedTypeFilters] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory | 'all'>('all');
+  const [storeWorkFilter, setStoreWorkFilter] = useState<StoreWorkFilter>('all');
 
-  // Filter projects based on search and filters
+  const isStoreCategory = activeCategory === 'zid' || activeCategory === 'salla';
+
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      // Search filter
-      const matchesSearch = searchQuery === '' || 
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase());
+    if (isStoreCategory) return [];
+    if (activeCategory === 'all') return projects;
+    return projects.filter((p) => p.category === activeCategory);
+  }, [activeCategory, isStoreCategory]);
 
-      // Technology filters
-      const matchesTech = selectedTechFilters.length === 0 ||
-        selectedTechFilters.some(tech => 
-          project.technologies.some(pTech => 
-            pTech.toLowerCase().includes(tech.toLowerCase())
-          )
-        );
+  const filteredStoreProjects = useMemo(() => {
+    if (!isStoreCategory) return [];
+    return filterStoreProjects(activeCategory, storeWorkFilter);
+  }, [activeCategory, isStoreCategory, storeWorkFilter]);
 
-      // Project type filter
-      const matchesType = selectedTypeFilters.length === 0 ||
-        selectedTypeFilters.some(type => {
-          const typeMap: { [key: string]: string } = {
-            'ecommerce': 'E-commerce',
-            'landingpage': 'Landing Page',
-            'erp': 'ERP System',
-            'chatbot': 'Chat Bot',
-            'saas': 'SaaS'
-          };
-          return project.projectType === typeMap[type];
+  const gridItems = isStoreCategory ? filteredStoreProjects : filteredProjects;
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.from('.projects-hero-badge', {
+          autoAlpha: 0,
+          y: 24,
+          scale: 0.92,
+          duration: 0.7,
+          ease: 'back.out(1.6)',
+          delay: 0.15,
         });
 
-      return matchesSearch && matchesTech && matchesType;
-    });
-  }, [searchQuery, selectedTechFilters, selectedTypeFilters]);
+        gsap.from('.projects-hero-desc', {
+          autoAlpha: 0,
+          y: 32,
+          duration: 0.8,
+          ease: 'power3.out',
+          delay: 0.55,
+        });
 
-  // Page entrance animations
-  useGSAP(() => {
-    if (!containerRef.current) return;
-
-    const tl = gsap.timeline({ delay: 0.2 });
-
-    // Back button animation
-    const backButton = containerRef.current.previousElementSibling?.querySelector('button') || 
-                       document.querySelector('.fixed.top-8.left-8');
-    if (backButton) {
-      gsap.fromTo(backButton,
-        {
-          opacity: 0,
-          x: -30,
-          scale: 0.9,
-        },
-        {
-          opacity: 1,
-          x: 0,
-          scale: 1,
+        gsap.from('.projects-hero-scroll', {
+          autoAlpha: 0,
+          y: 16,
           duration: 0.6,
-          ease: 'back.out(1.4)',
+          ease: 'power2.out',
+          delay: 0.9,
+        });
+
+        if (heroRef.current) {
+          gsap.to('.projects-orb-1', {
+            y: 100,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 1.4,
+            },
+          });
+          gsap.to('.projects-orb-2', {
+            y: 160,
+            x: -40,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 2,
+            },
+          });
+          gsap.to('.projects-hero-content', {
+            y: -60,
+            opacity: 0.4,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 1,
+            },
+          });
+        }
+
+        gsap.to('.projects-scroll-chevron', {
+          y: 8,
+          duration: 1.4,
+          repeat: -1,
+          yoyo: true,
+          ease: 'power1.inOut',
+        });
+      });
+
+      mm.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => {
+        const onMove = (e: MouseEvent) => {
+          const cx = (e.clientX / window.innerWidth - 0.5) * 2;
+          const cy = (e.clientY / window.innerHeight - 0.5) * 2;
+          gsap.to('.projects-orb-1', { x: cx * 30, y: cy * 20, duration: 1.3, ease: 'power2.out' });
+          gsap.to('.projects-orb-2', { x: cx * -22, y: cy * 28, duration: 1.3, ease: 'power2.out' });
+        };
+        window.addEventListener('mousemove', onMove);
+        return () => window.removeEventListener('mousemove', onMove);
+      });
+
+      return () => mm.revert();
+    },
+    { scope: pageRef }
+  );
+
+  useGSAP(
+    () => {
+      if (!gridRef.current) return;
+
+      const cards = gridRef.current.querySelectorAll('.project-grid-card, .store-project-card');
+      gsap.fromTo(
+        cards,
+        { autoAlpha: 0, y: 48, rotateX: 8, scale: 0.94 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          rotateX: 0,
+          scale: 1,
+          duration: 0.65,
+          stagger: 0.08,
+          ease: 'power3.out',
         }
       );
+    },
+    { scope: gridRef, dependencies: [activeCategory, storeWorkFilter, gridItems] }
+  );
+
+  const handleCategory = (id: ProjectCategory | 'all') => {
+    if (id === activeCategory || !gridRef.current) {
+      setActiveCategory(id);
+      if (id !== 'zid' && id !== 'salla') setStoreWorkFilter('all');
+      return;
     }
 
-    // Title animation - animate the SectionTitle component
-    const titleSection = containerRef.current.querySelector('.mb-12.text-center');
-    if (titleSection) {
-      const titleElement = titleSection.querySelector('.hidden.lg\\:flex');
-      const mobileTitle = titleSection.querySelector('h1');
-      
-      if (titleElement) {
-        tl.fromTo(titleElement,
-          {
-            opacity: 0,
-            y: -50,
-            scale: 0.95,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-          },
-          0
-        );
-      }
-      
-      if (mobileTitle) {
-        tl.fromTo(mobileTitle,
-          {
-            opacity: 0,
-            y: -30,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: 'power3.out',
-          },
-          0
-        );
-      }
-    }
-
-    // Search container animation
-    const searchRef = containerRef.current.querySelector('.search-container');
-    if (searchRef) {
-      tl.fromTo(searchRef,
-        {
-          opacity: 0,
-          y: 20,
-          scale: 0.98,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: 'power3.out',
-        },
-        0.2
-      );
-    }
-
-    // Filters container animation
-    const filtersRef = containerRef.current.querySelector('.filters-container');
-    if (filtersRef) {
-      tl.fromTo(filtersRef,
-        {
-          opacity: 0,
-          y: 20,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-        },
-        0.4
-      );
-
-      // Animate filter buttons with stagger
-      const filterButtons = filtersRef.querySelectorAll('.filter-btn');
-      if (filterButtons.length > 0) {
-        tl.fromTo(filterButtons,
-          {
-            opacity: 0,
-            scale: 0.8,
-            y: 10,
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.03,
-            ease: 'back.out(1.2)',
-          },
-          0.5
-        );
-      }
-    }
-
-    // Projects grid animation
-    if (projectsGridRef.current) {
-      const projectCards = projectsGridRef.current.querySelectorAll('.project-card');
-      if (projectCards.length > 0) {
-        tl.fromTo(projectCards,
-          {
-            opacity: 0,
-            y: 40,
-            scale: 0.9,
-            rotationY: 15,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            rotationY: 0,
-            duration: 0.7,
-            stagger: {
-              amount: 0.6,
-              from: 'start',
-            },
-            ease: 'power3.out',
-          },
-          0.6
-        );
-      }
-    }
-  }, { scope: containerRef });
-
-  // Animate filtered projects when filters change
-  useGSAP(() => {
-    if (!projectsGridRef.current) return;
-
-    const projectCards = projectsGridRef.current.querySelectorAll('.project-card');
-    
-    gsap.fromTo(projectCards,
-      {
-        opacity: 0,
-        y: 30,
-        scale: 0.95,
+    const cards = gridRef.current.querySelectorAll('.project-grid-card, .store-project-card');
+    gsap.to(cards, {
+      autoAlpha: 0,
+      y: 20,
+      scale: 0.96,
+      duration: 0.25,
+      stagger: 0.03,
+      ease: 'power2.in',
+      onComplete: () => {
+        setActiveCategory(id);
+        if (id !== 'zid' && id !== 'salla') setStoreWorkFilter('all');
       },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.05,
-        ease: 'power3.out',
-      }
-    );
-  }, { scope: projectsGridRef, dependencies: [filteredProjects] });
-
-  const toggleTechFilter = (filterId: string) => {
-    setSelectedTechFilters(prev =>
-      prev.includes(filterId)
-        ? prev.filter(id => id !== filterId)
-        : [...prev, filterId]
-    );
+    });
   };
 
-  const toggleTypeFilter = (filterId: string) => {
-    setSelectedTypeFilters(prev =>
-      prev.includes(filterId)
-        ? prev.filter(id => id !== filterId)
-        : [...prev, filterId]
-    );
-  };
+  const handleStoreWorkFilter = (id: StoreWorkFilter) => {
+    if (id === storeWorkFilter || !gridRef.current) {
+      setStoreWorkFilter(id);
+      return;
+    }
 
-  const clearAllFilters = () => {
-    setSearchQuery('');
-    setSelectedTechFilters([]);
-    setSelectedTypeFilters([]);
+    const cards = gridRef.current.querySelectorAll('.store-project-card');
+    gsap.to(cards, {
+      autoAlpha: 0,
+      y: 20,
+      scale: 0.96,
+      duration: 0.25,
+      stagger: 0.03,
+      ease: 'power2.in',
+      onComplete: () => setStoreWorkFilter(id),
+    });
   };
-
-  const hasActiveFilters = searchQuery || selectedTechFilters.length > 0 || selectedTypeFilters.length > 0;
 
   return (
-    <div 
-      ref={containerRef}
-      className="min-h-screen bg-black text-white relative overflow-hidden"
-    >
-      {/* Back button */}
-      <div className="fixed top-8 left-8 z-50">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition-all group"
-        >
-          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Back</span>
-        </button>
-      </div>
+    <div ref={pageRef} className="relative min-h-screen overflow-hidden bg-[#05070A] text-white">
+      <Background />
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-24 py-24 pt-32">
-        {/* Header */}
-        <div className="mb-12 text-center">
-          <SectionTitle text="ALL PROJECTS" containerRef={containerRef} />
-          {/* Mobile title */}
-          <h1 className="lg:hidden text-4xl md:text-6xl font-black text-white mb-4 text-center uppercase tracking-tighter">
-            All Projects
-          </h1>
+      <button
+        onClick={() => router.back()}
+        className="cursor-target fixed left-6 top-6 z-50 flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/80 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition hover:border-indigo-500/40"
+      >
+        <ArrowLeft size={18} />
+        Back
+      </button>
+
+      <section
+        ref={heroRef}
+        className="relative z-10 flex min-h-[92vh] flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-black via-[#05070A] to-[#0f172a] pt-24 pb-16"
+      >
+        <div
+          className="projects-orb-1 pointer-events-none absolute -left-32 top-1/4 h-[420px] w-[420px] rounded-full bg-indigo-600/12 blur-[100px]"
+          aria-hidden
+        />
+        <div
+          className="projects-orb-2 pointer-events-none absolute -right-24 bottom-1/4 h-[360px] w-[360px] rounded-full bg-violet-600/10 blur-[90px]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+          aria-hidden
+        />
+
+        <div className="projects-hero-content relative mx-auto flex w-full max-w-[1375px] flex-col items-center px-5 text-center md:px-10 lg:px-20">
+          <span className="projects-hero-badge mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[2px] text-indigo-300">
+            <Sparkles size={14} />
+            Portfolio Showcase
+          </span>
+
+          <RevealText
+            text="Evolution of My Work"
+            as="h1"
+            className="text-4xl font-extrabold leading-tight text-indigo-400 sm:text-5xl md:text-6xl lg:text-7xl"
+            immediate
+            delay={0.35}
+          />
+
+          <p className="projects-hero-desc mt-6 max-w-2xl text-base leading-relaxed text-slate-400 md:text-lg">
+            Every project here tells a story — from polished frontends and scalable backends
+            to full-stack platforms and custom themes on{' '}
+            <span className="text-indigo-300">Zid</span> &{' '}
+            <span className="text-indigo-300">Salla</span>. Scroll down, explore, and see
+            what we can build together.
+          </p>
+
+          <div className="projects-hero-scroll mt-10 flex flex-col items-center gap-2 text-slate-500">
+            <span className="text-xs uppercase tracking-[3px]">Explore below</span>
+            <div className="projects-scroll-chevron flex h-10 w-10 items-center justify-center rounded-full border border-indigo-500/30 bg-indigo-500/5">
+              <ChevronDown size={18} className="text-indigo-400" />
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Search Container */}
-        <div className="search-container mb-8 max-w-2xl mx-auto">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search projects by title..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all"
+      <SectionDivider intense />
+
+      <section className="projects-work-section relative z-10" style={{ perspective: '1200px' }}>
+        <div className="page-container py-5 lg:py-12">
+          <div className="mb-10 text-center md:mb-14">
+            <Reveal>
+              <span className="mb-3 inline-block text-[13px] font-semibold uppercase tracking-[2px] text-indigo-400">
+                Full Portfolio
+              </span>
+            </Reveal>
+            <RevealText
+              text="My Work"
+              as="h2"
+              className="text-3xl font-black uppercase tracking-tighter md:text-5xl"
             />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            <Reveal className="mx-auto mt-4 max-w-xl text-slate-400" delay={0.12}>
+              Filter by specialty and dive into the details of each build.
+            </Reveal>
+          </div>
+
+          <div className="mb-10 flex flex-wrap justify-center gap-2 md:gap-3">
+            {projectCategories.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategory(cat.id)}
+                  className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-300 md:px-5 ${
+                    isActive
+                      ? 'scale-105 border-indigo-500 bg-indigo-600 text-white shadow-[0_0_24px_rgba(79,70,229,0.35)]'
+                      : 'border-white/10 bg-white/5 text-slate-300 hover:scale-[1.02] hover:border-indigo-500/30 hover:bg-white/10'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {isStoreCategory && (
+            <div className="mb-8 flex flex-wrap justify-center gap-2 md:gap-3">
+              {storeWorkFilters.map((filter) => {
+                const isActive = storeWorkFilter === filter.id;
+                return (
+                  <button
+                    key={filter.id}
+                    onClick={() => handleStoreWorkFilter(filter.id)}
+                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 md:px-5 ${
+                      isActive
+                        ? 'border-emerald-500/50 bg-emerald-600/20 text-emerald-200 shadow-[0_0_20px_rgba(52,211,153,0.2)]'
+                        : 'border-white/10 bg-white/5 text-slate-400 hover:border-emerald-500/30 hover:text-slate-200'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="py-12 md:py-20">
+            {gridItems.length > 0 ? (
+              <div
+                ref={gridRef}
+                className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-8 xl:grid-cols-3 xl:gap-10"
               >
-                <X size={20} />
-              </button>
+                {isStoreCategory
+                  ? filteredStoreProjects.map((project) => (
+                      <StoreProjectCard key={project.id} project={project} />
+                    ))
+                  : filteredProjects.map((project) => (
+                      <ProjectGridCard key={project.id} project={project} />
+                    ))}
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-400">
+                No projects in this category yet.
+              </div>
             )}
           </div>
         </div>
+      </section>
 
-        {/* Filters Container */}
-        <div className="filters-container mb-12">
-          {/* Technology Filters */}
-          <div className="mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Technologies</h3>
-            <div className="flex flex-wrap gap-3">
-              {technologyFilters.map((filter) => {
-                const Icon = filter.icon;
-                const isActive = selectedTechFilters.includes(filter.id);
-                return (
-                  <button
-                    key={filter.id}
-                    onClick={() => toggleTechFilter(filter.id)}
-                    className={`filter-btn flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
-                      isActive
-                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] scale-105'
-                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20 hover:-translate-y-0.5'
-                    }`}
-                  >
-                    <Icon size={16} />
-                    <span className="text-sm font-medium">{filter.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Project Type Filters */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Project Type</h3>
-            <div className="flex flex-wrap gap-3">
-              {projectTypeFilters.map((filter) => {
-                const Icon = filter.icon;
-                const isActive = selectedTypeFilters.includes(filter.id);
-                return (
-                  <button
-                    key={filter.id}
-                    onClick={() => toggleTypeFilter(filter.id)}
-                    className={`filter-btn flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
-                      isActive
-                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] scale-105'
-                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20 hover:-translate-y-0.5'
-                    }`}
-                  >
-                    <Icon size={16} />
-                    <span className="text-sm font-medium">{filter.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="mt-6 px-6 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <X size={16} />
-              Clear all filters
-            </button>
-          )}
-        </div>
-
-        {/* Projects Grid or Empty State */}
-        {filteredProjects.length > 0 ? (
-          <div 
-            ref={projectsGridRef}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {filteredProjects.map((project) => (
-              <div
-                key={project.id}
-                onClick={() => router.push(`/project/${project.slug}`)}
-                className="project-card relative group cursor-pointer"
-              >
-                <div className="relative w-full h-[300px] rounded-2xl overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-                    style={{ filter: 'grayscale(100%)' }}
-                  />
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  />
-                  <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{ background: `linear-gradient(to top, ${project.color}20, transparent)` }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                    <h3 className="text-white text-xl font-bold uppercase mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-300 text-sm mb-3">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.slice(0, 3).map((tech, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 text-xs font-medium bg-white/10 rounded text-gray-300"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptyState />
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Empty State Component
-function EmptyState() {
-  const emptyRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (!emptyRef.current) return;
-
-    gsap.fromTo(emptyRef.current,
-      {
-        opacity: 0,
-        scale: 0.9,
-      },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 0.6,
-        ease: 'back.out(1.2)',
-      }
-    );
-  }, { scope: emptyRef });
-
-  return (
-    <div 
-      ref={emptyRef}
-      className="text-center py-20"
-    >
-      <div className="max-w-md mx-auto">
-        <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-600/20 border border-indigo-500/30">
-          <Search size={32} className="text-indigo-400" />
-        </div>
-        <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-          No Projects Found
-        </h3>
-        <p className="text-gray-400 mb-6">
-          We couldn't find any projects matching your filters. Try adjusting your search or filters.
-        </p>
-        <p className="text-sm text-gray-500 italic">
-          Coming soon...
-        </p>
-      </div>
+      <SectionDivider />
+      <ContactSection />
     </div>
   );
 }

@@ -4,16 +4,17 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Github, Linkedin, Facebook, Instagram, Mail, Home, User, Briefcase, Award, MessageSquare, FolderOpen } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Facebook, Instagram, Mail, Home, User, Briefcase, Award, MessageSquare, FolderOpen, Code2, ExternalLink } from 'lucide-react';
+import { STORES_SITE_URL } from '@/lib/site';
 
 const navItems = [
-  { name: 'Home', href: '/', icon: Home },
-  { name: 'About', href: '#about', icon: User },
-  { name: 'Projects', href: '#projects', icon: FolderOpen },
-  { name: 'Experience', href: '#experience', icon: Briefcase },
-  { name: 'Testimonials', href: '#testimonials', icon: Award },
-  { name: 'Contact', href: '#contact', icon: MessageSquare },
-  { name: 'All Projects', href: '/projects', icon: FolderOpen },
+  { name: 'Home', href: '/', icon: Home, external: false },
+  { name: 'Projects', href: '/projects', icon: FolderOpen, external: false },
+  { name: 'Services', href: '#services', icon: Briefcase, external: false },
+  { name: 'Skills', href: '#skills', icon: Code2, external: false },
+  { name: 'Testimonials', href: '#testimonials', icon: Award, external: false },
+  { name: 'Contact', href: '#contact', icon: MessageSquare, external: false },
+  { name: 'Zid & Salla', href: STORES_SITE_URL, icon: ExternalLink, external: true },
 ];
 
 const socialLinks = [
@@ -203,7 +204,12 @@ export default function MobileSidebar() {
     setIsOpen(false);
   }, [pathname]);
 
-  const handleClick = (href: string) => {
+  const handleClick = (href: string, external?: boolean) => {
+    if (external || href.startsWith('http')) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+      setIsOpen(false);
+      return;
+    }
     if (href.startsWith('#')) {
       // Scroll to section on same page
       if (pathname === '/') {
@@ -302,7 +308,7 @@ export default function MobileSidebar() {
                 return (
                   <li key={item.name} className="nav-item">
                     <button
-                      onClick={() => handleClick(item.href)}
+                      onClick={() => handleClick(item.href, item.external)}
                       className="w-full text-left cursor-pointer group/nav"
                     >
                       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${

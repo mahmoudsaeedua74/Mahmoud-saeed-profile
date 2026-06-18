@@ -3,6 +3,8 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef, useState } from 'react';
 import { Github, Linkedin, Facebook, Mail, ArrowUpRight, ChevronDown } from 'lucide-react';
+import Magnetic from '../Magnetic';
+import { getLenis } from '@/lib/lenis';
 
 const roles = [
   { text: 'FRONTEND DEVELOPER', color: '#6366f1' },
@@ -129,7 +131,76 @@ export default function Hero() {
       ease: 'sine.inOut',
     });
 
-    return () => clearTimeout(timer);
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.to('.hero-orb-1', {
+        y: 140,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.2,
+        },
+      });
+      gsap.to('.hero-orb-2', {
+        y: 200,
+        x: 50,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.8,
+        },
+      });
+      gsap.to('.hero-grid', {
+        y: 80,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 0.8,
+        },
+      });
+      gsap.to('.hero-content-left', {
+        y: -70,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      });
+      gsap.to('.hero-content-right', {
+        y: -120,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.2,
+        },
+      });
+    });
+    mm.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => {
+      const onMove = (e: MouseEvent) => {
+        const cx = (e.clientX / window.innerWidth - 0.5) * 2;
+        const cy = (e.clientY / window.innerHeight - 0.5) * 2;
+        gsap.to('.hero-orb-1', { x: cx * 28, y: cy * 20, duration: 1.2, ease: 'power2.out' });
+        gsap.to('.hero-orb-2', { x: cx * -20, y: cy * 26, duration: 1.2, ease: 'power2.out' });
+        gsap.to('.hero-grid', { x: cx * 10, y: cy * 8, duration: 1.4, ease: 'power2.out' });
+      };
+      window.addEventListener('mousemove', onMove);
+      return () => window.removeEventListener('mousemove', onMove);
+    });
+
+    return () => {
+      clearTimeout(timer);
+      mm.revert();
+    };
   }, { scope: container });
 
   // 2. Role rotation
@@ -161,14 +232,27 @@ export default function Hero() {
     <section
       ref={container}
       id="hero"
-      className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 lg:px-24 pt-32 pb-8 md:pb-16 relative z-10"
+      className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-hidden px-4 pt-32 pb-8 md:px-12 md:pb-16 lg:px-24"
     >
-      <div className="max-w-[1440px] w-full mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-16 md:gap-0">
+      <div
+        className="hero-orb-1 pointer-events-none absolute -left-40 top-1/4 h-[480px] w-[480px] rounded-full bg-indigo-600/15 blur-[120px]"
+        aria-hidden
+      />
+      <div
+        className="hero-orb-2 pointer-events-none absolute -right-32 bottom-1/3 h-[400px] w-[400px] rounded-full bg-violet-600/10 blur-[100px]"
+        aria-hidden
+      />
+      <div
+        className="hero-grid pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_at_center,black_15%,transparent_70%)]"
+        aria-hidden
+      />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-16 md:flex-row md:items-start md:gap-0">
 
         {/* Left Content Column */}
-        <div className="hero-section relative z-10 w-full md:w-[45%] flex flex-col items-center md:items-start text-center md:text-left space-y-12">
+        <div className="hero-content-left hero-section relative z-10 flex w-full flex-col items-center space-y-12 text-center md:w-[45%] md:items-start md:text-left">
           {/* Decorative Background */}
-          <div className="hero-decorative-bg absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 blur-[150px] rounded-full -z-10" />
+          <div className="hero-decorative-bg absolute -top-40 -left-40 -z-10 h-96 w-96 rounded-full bg-indigo-600/10 blur-[150px]" />
 
           <div className="hero-greeting head-1 uppercase font-bold text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] flex flex-wrap gap-x-4 gap-y-2 justify-center md:justify-start">
             {"Hi, My Name Is".split(" ").map((word, idx) => (
@@ -193,7 +277,7 @@ export default function Hero() {
         </div>
 
         {/* Right Content Column */}
-        <div className="w-full md:w-[50%] flex flex-col items-center md:items-end justify-start gap-12 md:gap-20">
+        <div className="hero-content-right flex w-full flex-col items-center justify-start gap-12 md:w-[50%] md:items-end md:gap-20">
 
           {/* Role Section */}
           <div className="hero-role-section flex flex-col items-center md:items-end space-y-4">
@@ -268,12 +352,16 @@ function ScrollToProjects() {
 
   const scrollToProjects = () => {
     const projectsSection = document.getElementById('projects');
-    if (projectsSection) {
-      projectsSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    if (!projectsSection) return;
+    const lenis = getLenis();
+    if (lenis) {
+      lenis.scrollTo(projectsSection, { offset: -80 });
+      return;
     }
+    projectsSection.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   useGSAP(() => {

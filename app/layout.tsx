@@ -4,6 +4,8 @@ import "./globals.css";
 import CustomCursor from "./components/CustomCursor";
 import MobileSidebar from "./components/MobileSidebar";
 import Navbar from "./components/Navbar";
+import ScrollProgress from "./components/ScrollProgress";
+import SmoothScroll from "./components/SmoothScroll";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -25,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${plusJakartaSans.variable} font-sans antialiased cursor-none`}
+        className={`${plusJakartaSans.variable} font-sans antialiased`}
       >
+        <SmoothScroll />
+        <ScrollProgress />
         <CustomCursor />
         <Navbar />
         <MobileSidebar />

@@ -37,6 +37,104 @@ body {
   overflow-x: hidden;
 }
 
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body.cursor-custom {
+    cursor: none;
+  }
+}
+
+::selection {
+  background: rgba(79, 70, 229, 0.35);
+  color: #fff;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Unified page container — min 20px side padding */
+.page-container {
+  width: 100%;
+  max-width: 1375px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding-inline: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-inline: 80px;
+  }
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.type-kicker {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.45;
+}
+
+@media (min-width: 640px) {
+  .type-kicker {
+    font-size: 0.9375rem;
+  }
+}
+
+.type-section-title {
+  font-size: clamp(1.9375rem, 4.2vw + 0.8rem, 2.75rem);
+  line-height: 1.22;
+}
+
+.type-card-title {
+  font-size: clamp(1.1875rem, 2.2vw + 0.7rem, 1.5rem);
+  line-height: 1.28;
+}
+
+.type-body {
+  font-size: clamp(1.0625rem, 1.6vw + 0.85rem, 1.1875rem);
+  line-height: 1.78;
+}
+
+.type-body-sm {
+  font-size: clamp(0.9375rem, 1.1vw + 0.78rem, 1.0625rem);
+  line-height: 1.72;
+}
+
+.type-btn {
+  font-size: clamp(0.9375rem, 1vw + 0.75rem, 1.0625rem);
+  line-height: 1.4;
+}
+
+/* ScrollPanels — 3D stage */
+.sp-scene {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+.sp-stage-3d,
+.sp-panel {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.sp-hero-title {
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
 /* Bouncing arrow animation */
 @keyframes bounce-arrow {
   0%, 100% {

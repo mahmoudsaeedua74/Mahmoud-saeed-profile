@@ -2,14 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { STORES_SITE_URL } from '@/lib/site';
 
 const navItems = [
-  { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Home', href: '/', type: 'page' as const },
+  { name: 'Projects', href: '/projects', type: 'page' as const },
+  { name: 'Stores', href: STORES_SITE_URL, type: 'external' as const },
+  { name: 'Contact', href: '/#contact', type: 'page' as const },
 ];
 
 export default function Navbar() {
@@ -20,15 +21,15 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if this is the first load (loading screen will delay)
-    const hasLoadedBefore = typeof window !== 'undefined' ? sessionStorage.getItem('hasLoadedBefore') : null;
-    
-    // Initial entrance - delay only on home page if it's the first load
+    const hasLoadedBefore =
+      typeof window !== 'undefined' ? sessionStorage.getItem('hasLoadedBefore') : null;
+
     const isFirstLoad = pathname === '/' && hasLoadedBefore !== 'true';
     const entranceDelay = isFirstLoad ? 5.5 : 0.3;
 
     if (navRef.current) {
-      gsap.fromTo(navRef.current,
+      gsap.fromTo(
+        navRef.current,
         { y: -100, opacity: 0 },
         {
           y: 0,
@@ -65,40 +66,64 @@ export default function Navbar() {
     }
   }, [hidden]);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      router.push('/' + href);
+  const handleClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    item: (typeof navItems)[number]
+  ) => {
+    if (item.type === 'external') return;
+
+    if (item.href.startsWith('/#')) {
+      e.preventDefault();
+      const id = item.href.replace('/#', '');
+      if (pathname === '/') {
+        const element = document.getElementById(id);
+        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        router.push(item.href);
+      }
+      return;
+    }
+
+    if (item.href === '/' && pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   return (
     <nav
       ref={navRef}
-      className="hidden lg:flex fixed top-10 inset-x-0 mx-auto z-[5000] max-w-fit items-center justify-center space-x-4 px-6 md:px-10 py-4 md:py-5 rounded-xl border shadow-lg"
+      className="fixed inset-x-0 top-10 z-[5000] mx-auto hidden max-w-fit items-center justify-center space-x-4 rounded-xl border px-6 py-4 shadow-lg md:flex md:px-10 md:py-5"
       style={{
         backdropFilter: 'blur(16px) saturate(180%)',
         backgroundColor: 'rgba(17, 25, 40, 0.75)',
         borderColor: 'rgba(79, 70, 229, 0.2)',
       }}
     >
-      {navItems.map((item) => (
-        <a
-          key={item.name}
-          href={item.href}
-          onClick={(e) => handleClick(e, item.href)}
-          className="cursor-target relative text-neutral-200 hover:text-white flex items-center space-x-1 cursor-pointer transition-colors group"
-        >
-          <span className="text-xs md:text-sm font-medium">{item.name}</span>
-          <span
-            className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-indigo-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-            style={{ transformOrigin: 'left' }}
-          />
-        </a>
-      ))}
+      {navItems.map((item) =>
+        item.type === 'external' ? (
+          <a
+            key={item.name}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex cursor-pointer items-center space-x-1 text-neutral-200 transition-colors hover:text-white"
+          >
+            <span className="text-xs font-medium md:text-sm">{item.name}</span>
+            <span className="absolute -bottom-1 left-0 right-0 h-0.5 scale-x-0 rounded-full bg-indigo-600 transition-transform duration-300 group-hover:scale-x-100" />
+          </a>
+        ) : (
+          <Link
+            key={item.name}
+            href={item.href}
+            onClick={(e) => handleClick(e, item)}
+            className="group relative flex cursor-pointer items-center space-x-1 text-neutral-200 transition-colors hover:text-white"
+          >
+            <span className="text-xs font-medium md:text-sm">{item.name}</span>
+            <span className="absolute -bottom-1 left-0 right-0 h-0.5 scale-x-0 rounded-full bg-indigo-600 transition-transform duration-300 group-hover:scale-x-100" />
+          </Link>
+        )
+      )}
     </nav>
   );
 }

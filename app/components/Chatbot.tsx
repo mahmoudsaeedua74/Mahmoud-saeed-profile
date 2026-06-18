@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import emailjs from '@emailjs/browser';
 import { MessageSquare, X, Send, ChevronRight, RefreshCw, Loader2 } from 'lucide-react';
 
 /* -------------------------------------------------------------------------- */
@@ -387,42 +386,32 @@ export default function Chatbot() {
         setIsSubmitting(true);
 
         try {
-            // Determine contact type
-            const contactType = isValidEmail(trimmed) ? 'Email' : 'Phone';
-            
-            // Prepare EmailJS template parameters
-            const templateParams = {
-                language: state.language === 'ar' ? 'Arabic' : 'English',
-                service: state.service || '',
-                details: state.details || '',
-                contact: trimmed,
-                contact_type: contactType,
-            };
+            const res = await fetch('/api/lead', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    language: state.language,
+                    service: state.service || '',
+                    details: state.details || '',
+                    contact: trimmed,
+                }),
+            });
 
-            // Send email using EmailJS
-            await emailjs.send(
-                'service_pycouza', // Your EmailJS service ID
-                'template_oc2aavk', // Your EmailJS template ID
-                templateParams,
-                'Bb6mNSVsbyMC0KQOx' // Your EmailJS public key
-            );
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || 'Request failed');
+            }
 
             setState(prev => ({ ...prev, contact: trimmed, step: 'DONE' }));
             addBotMessage(t.success, 'DONE');
-        } catch (error: any) {
-            console.error('EmailJS Error:', error);
-            
-            // Better error messages
-            let errorMsg = state.language === 'ar'
+        } catch (error: unknown) {
+            console.error('Lead API Error:', error);
+
+            const errorMsg = state.language === 'ar'
                 ? 'حدث خطأ. الرجاء المحاولة مرة أخرى.'
-                : 'Something went wrong. Please try again.';
-            
-            if (error?.status === 412) {
-                errorMsg = state.language === 'ar'
-                    ? 'يرجى إعادة الاتصال بحساب Gmail في EmailJS'
-                    : 'Please reconnect your Gmail account in EmailJS dashboard';
-            }
-            
+                : (error instanceof Error ? error.message : 'Something went wrong. Please try again.');
+
             addBotMessage(errorMsg, 'CONTACT_INFO');
         } finally {
             setIsSubmitting(false);

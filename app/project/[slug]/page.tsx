@@ -2,259 +2,312 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useRef, useEffect } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { useRef } from 'react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Calendar,
+  CheckCircle2,
+  Layers,
+  User,
+} from 'lucide-react';
+import Background from '@/app/components/Background';
+import { getAdjacentProjects, getProjectBySlug } from '@/app/data/projects';
 
-// Project data - in a real app, this would come from an API or CMS
-const allProjects = [
-  {
-    id: '1',
-    title: 'Dr. Games',
-    slug: 'drgames',
-    image: '/drgames-hero.png',
-    color: '#6366f1',
-    description: 'Advanced Hybrid Gaming Marketplace',
-    fullDescription: 'A comprehensive gaming marketplace platform that combines traditional and modern gaming experiences. Built with cutting-edge technology to deliver seamless user experiences.',
-    technologies: ['React', 'Next.js', 'Node.js', 'MongoDB', 'GSAP'],
-    link: 'https://example.com',
-  },
-  {
-    id: '2',
-    title: 'Crawleo',
-    slug: 'crawleo',
-    image: '/crawleo4.png',
-    color: '#10b981',
-    description: 'Real-Time Web Intelligence API',
-    fullDescription: 'A powerful web scraping and intelligence API that provides real-time data extraction and analysis capabilities for businesses.',
-    technologies: ['Python', 'FastAPI', 'PostgreSQL', 'Redis'],
-    link: 'https://example.com',
-  },
-  {
-    id: '3',
-    title: 'Invia',
-    slug: 'invia',
-    image: '/invia5.png',
-    color: '#8b5cf6',
-    description: 'Modern Logistics Platform',
-    fullDescription: 'A complete logistics management system designed to streamline shipping and delivery operations with real-time tracking.',
-    technologies: ['React', 'TypeScript', 'Express', 'MySQL'],
-    link: 'https://example.com',
-  },
-  {
-    id: '4',
-    title: '360 Home Offers',
-    slug: '360homeoffers',
-    image: '/houses1.png',
-    color: '#f59e0b',
-    description: 'Real Estate Platform Redesign',
-    fullDescription: 'A complete redesign of a real estate platform focusing on user experience and modern design principles.',
-    technologies: ['Next.js', 'Tailwind CSS', 'Prisma', 'PostgreSQL'],
-    link: 'https://example.com',
-  },
-  {
-    id: '5',
-    title: 'Crettiva',
-    slug: 'crettiva',
-    image: '/c1.png',
-    color: '#ec4899',
-    description: 'Digital Agency Portfolio',
-    fullDescription: 'A stunning portfolio website for a digital agency showcasing their work and services with elegant animations.',
-    technologies: ['React', 'GSAP', 'Framer Motion', 'Contentful'],
-    link: 'https://example.com',
-  },
-  {
-    id: '6',
-    title: 'Movie-Boi',
-    slug: 'movie-boi-react-imdb-netflex-clone',
-    image: '/Screenshot (49).png',
-    color: '#ef4444',
-    description: 'React-IMDB-Netflix Clone',
-    fullDescription: 'A full-featured movie streaming platform clone with search, recommendations, and user accounts.',
-    technologies: ['React', 'Redux', 'Firebase', 'TMDB API'],
-    link: 'https://example.com',
-  },
-  {
-    id: '7',
-    title: 'Al Manara',
-    slug: 'almenara-furniture-transfer',
-    image: '/ma5.png',
-    color: '#06b6d4',
-    description: 'E-commerce Furniture Platform',
-    fullDescription: 'An e-commerce platform specializing in furniture with advanced filtering and visualization features.',
-    technologies: ['Next.js', 'Stripe', 'Sanity CMS', 'Tailwind CSS'],
-    link: 'https://example.com',
-  },
-  {
-    id: '8',
-    title: "A'atene",
-    slug: 'aatene-ecommerce',
-    image: '/at1.png',
-    color: '#14b8a6',
-    description: 'E-commerce Platform',
-    fullDescription: 'A modern e-commerce solution with advanced product management and checkout flow.',
-    technologies: ['Shopify', 'Liquid', 'JavaScript', 'CSS'],
-    link: 'https://example.com',
-  },
-];
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-export default function ProjectDetailPage() {
+export default function ProjectViewPage() {
   const params = useParams();
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const slug = typeof params.slug === 'string' ? params.slug : '';
+  const project = getProjectBySlug(slug);
+  const { prev, next } = getAdjacentProjects(slug);
+
+  const pageRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
 
-  const project = allProjects.find((p) => p.slug === params.slug);
+  useGSAP(
+    () => {
+      if (!project || !pageRef.current) return;
 
-  useEffect(() => {
-    if (!project) {
-      router.push('/');
-    }
-  }, [project, router]);
-
-  useGSAP(() => {
-    if (!containerRef.current || !project) return;
-
-    // Entrance animations
-    const tl = gsap.timeline();
-
-    tl.from(imageRef.current, {
-      scale: 0.9,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out',
-    })
-      .from(contentRef.current, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
+      const sections = gsap.utils.toArray<HTMLElement>('.pv-reveal');
+      gsap.from(sections, {
+        autoAlpha: 0,
+        y: 48,
+        duration: 0.8,
+        stagger: 0.1,
         ease: 'power3.out',
-      }, '-=0.5');
-
-    // Parallax effect on scroll
-    if (imageRef.current) {
-      gsap.to(imageRef.current, {
-        y: -100,
-        ease: 'none',
         scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
+          trigger: pageRef.current,
+          start: 'top 80%',
+          once: true,
         },
       });
-    }
-  }, { scope: containerRef, dependencies: [project] });
+
+      if (heroRef.current) {
+        gsap.from(heroRef.current.querySelectorAll('.pv-hero-item'), {
+          autoAlpha: 0,
+          y: 36,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: 'power3.out',
+          delay: 0.15,
+        });
+      }
+    },
+    { scope: pageRef, dependencies: [project] }
+  );
 
   if (!project) {
-    return null;
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#05070A] px-6 text-center text-white">
+        <h1 className="text-3xl font-black">Project not found</h1>
+        <p className="mt-3 text-slate-400">This project does not exist or was removed.</p>
+        <button
+          onClick={() => router.push('/#projects')}
+          className="mt-8 rounded-xl bg-indigo-600 px-6 py-3 font-bold transition hover:bg-indigo-500"
+        >
+          Back to Projects
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className="min-h-screen bg-black text-white relative overflow-hidden"
-    >
-      {/* Background gradient */}
-      <div 
-        className="absolute inset-0 opacity-10"
-        style={{
-          background: `radial-gradient(circle at 50% 50%, ${project.color}, transparent 70%)`,
-        }}
-      />
+    <div ref={pageRef} className="relative min-h-screen overflow-hidden bg-[#05070A] text-white">
+      <Background />
 
-      {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="fixed top-8 left-8 z-50 flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition-all group"
+        className="fixed left-6 top-6 z-50 flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/80 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition hover:border-indigo-500/40 hover:bg-slate-900"
       >
-        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-        <span className="text-sm font-medium">Back</span>
+        <ArrowLeft size={18} />
+        Back
       </button>
 
-      {/* Project Image Hero */}
-      <div 
-        ref={imageRef}
-        className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden"
-      >
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full h-full object-cover"
-        />
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to bottom, transparent 0%, black 100%)`,
-          }}
-        />
-      </div>
-
-      {/* Content */}
-      <div 
-        ref={contentRef}
-        className="relative z-10 max-w-6xl mx-auto px-4 md:px-8 lg:px-24 py-16"
-      >
-        {/* Project Header */}
-        <div className="mb-12">
-          <div 
-            className="inline-block px-4 py-2 rounded-full mb-6 text-sm font-bold uppercase tracking-wider"
-            style={{
-              background: `${project.color}20`,
-              color: project.color,
-              border: `1px solid ${project.color}40`,
-            }}
-          >
-            {project.description}
+      {/* Hero */}
+      <section ref={heroRef} className="relative z-10 pt-28">
+        <div className="wrap">
+          <div className="pv-hero-item mb-6 flex flex-wrap items-center gap-3">
+            <span
+              className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider"
+              style={{
+                borderColor: `${project.color}50`,
+                background: `${project.color}18`,
+                color: project.color,
+              }}
+            >
+              {project.tag}
+            </span>
+            <span className="text-sm text-slate-400">{project.projectType}</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">
+
+          <h1 className="pv-hero-item text-4xl font-black uppercase leading-[0.95] tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl">
             {project.title}
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl leading-relaxed">
+
+          <p className="pv-hero-item mt-6 max-w-3xl text-lg leading-relaxed text-slate-300 md:text-xl">
             {project.fullDescription}
           </p>
-        </div>
 
-        {/* Technologies */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 uppercase tracking-tighter">Technologies</h2>
-          <div className="flex flex-wrap gap-3">
-            {project.technologies.map((tech, idx) => (
-              <span
-                key={idx}
-                className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-medium"
+          <div className="pv-hero-item mt-8 flex flex-wrap gap-6 text-sm text-slate-400">
+            <span className="inline-flex items-center gap-2">
+              <Calendar size={16} className="text-indigo-400" />
+              {project.year}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <User size={16} className="text-indigo-400" />
+              {project.role}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Layers size={16} className="text-indigo-400" />
+              {project.projectType}
+            </span>
+          </div>
+
+          <div className="pv-hero-item mt-10 grid grid-cols-3 gap-4 sm:max-w-lg">
+            {project.metrics.map((metric) => (
+              <div
+                key={metric.l}
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm"
               >
-                {tech}
-              </span>
+                <div className="text-2xl font-extrabold text-white sm:text-3xl">{metric.v}</div>
+                <div className="mt-1 text-xs uppercase tracking-wider text-slate-400">
+                  {metric.l}
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-4">
-          {project.link && (
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl font-bold uppercase tracking-tighter hover:scale-105 transition-transform"
-              style={{
-                background: project.color,
-                color: 'white',
-              }}
-            >
-              View Project
-            </a>
-          )}
-          <button
-            onClick={() => router.push('/#projects')}
-            className="px-8 py-4 rounded-2xl font-bold uppercase tracking-tighter border-2 border-white/20 hover:border-white/40 transition-all"
+        <div className="wrap mt-14">
+          <div
+            className="relative aspect-video overflow-hidden rounded-3xl border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
+            style={{ boxShadow: `0 30px 80px ${project.color}22` }}
           >
-            All Projects
-          </button>
+            <Image
+              src={project.image}
+              alt={project.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 1180px) 100vw, 1180px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#05070A] via-transparent to-transparent" />
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Case study */}
+      <section ref={contentRef} className="relative z-10 py-20 md:py-28">
+        <div className="wrap space-y-20">
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              { title: 'The Problem', body: project.problem },
+              { title: 'The Solution', body: project.solution },
+              { title: 'The Outcome', body: project.outcome },
+            ].map((block) => (
+              <article
+                key={block.title}
+                className="pv-reveal rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm"
+              >
+                <h2 className="mb-4 text-sm font-bold uppercase tracking-[2px] text-indigo-400">
+                  {block.title}
+                </h2>
+                <p className="leading-relaxed text-slate-300">{block.body}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="pv-reveal grid gap-12 lg:grid-cols-2">
+            <div>
+              <h2 className="mb-6 text-3xl font-black uppercase tracking-tighter">
+                Key Features
+              </h2>
+              <ul className="space-y-4">
+                {project.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle2
+                      size={20}
+                      className="mt-0.5 shrink-0 text-indigo-400"
+                    />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="mb-6 text-3xl font-black uppercase tracking-tighter">
+                Tech Stack
+              </h2>
+              <div className="flex flex-wrap gap-3">
+                {project.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {project.gallery.length > 1 && (
+            <div className="pv-reveal">
+              <h2 className="mb-8 text-3xl font-black uppercase tracking-tighter">
+                Gallery
+              </h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                {project.gallery.map((src, i) => (
+                  <div
+                    key={`${src}-${i}`}
+                    className="relative aspect-video overflow-hidden rounded-2xl border border-white/10"
+                  >
+                    <Image
+                      src={src}
+                      alt={`${project.title} screenshot ${i + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="pv-reveal flex flex-wrap gap-4">
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 font-bold shadow-[0_8px_22px_rgba(79,70,229,0.35)] transition hover:-translate-y-0.5 hover:bg-indigo-500"
+              >
+                View Live Project
+                <ArrowUpRight size={18} />
+              </a>
+            )}
+            <Link
+              href="/#projects"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-8 py-4 font-bold transition hover:border-indigo-500/40 hover:bg-white/5"
+            >
+              All Projects
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Prev / Next */}
+      <section className="relative z-10 border-t border-white/10 py-12">
+        <div className="wrap grid gap-6 md:grid-cols-2">
+          {prev ? (
+            <Link
+              href={`/project/${prev.slug}`}
+              className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-indigo-500/30 hover:bg-white/[0.05]"
+            >
+              <span className="text-xs uppercase tracking-wider text-slate-500">
+                Previous
+              </span>
+              <div className="mt-2 flex items-center justify-between gap-4">
+                <span className="text-xl font-bold">{prev.title}</span>
+                <ArrowLeft
+                  size={20}
+                  className="shrink-0 text-indigo-400 transition group-hover:-translate-x-1"
+                />
+              </div>
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          {next ? (
+            <Link
+              href={`/project/${next.slug}`}
+              className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-right transition hover:border-indigo-500/30 hover:bg-white/[0.05] md:col-start-2"
+            >
+              <span className="text-xs uppercase tracking-wider text-slate-500">
+                Next
+              </span>
+              <div className="mt-2 flex items-center justify-between gap-4">
+                <ArrowRight
+                  size={20}
+                  className="shrink-0 text-indigo-400 transition group-hover:translate-x-1"
+                />
+                <span className="text-xl font-bold">{next.title}</span>
+              </div>
+            </Link>
+          ) : null}
+        </div>
+      </section>
     </div>
   );
 }
