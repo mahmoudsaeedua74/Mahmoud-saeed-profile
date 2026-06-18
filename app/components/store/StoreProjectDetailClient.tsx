@@ -15,22 +15,6 @@ import { getStoreProject, platformColor } from '@/app/data/store-projects';
 import { en } from '@/lib/localized';
 import { storeLabels } from '@/lib/store-labels';
 
-function BackIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden
-    >
-      <path d="M19 12H5M12 19l-7-7 7-7" />
-    </svg>
-  );
-}
-
 function CheckIcon() {
   return (
     <svg
@@ -73,14 +57,6 @@ export default function StoreProjectDetailClient({ id }: { id: string }) {
   return (
     <div className="relative min-h-screen bg-[#05070A] text-white">
       <Background />
-
-      <Link
-        href="/projects"
-        className="fixed start-6 top-6 z-[60] flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/80 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition hover:border-indigo-500/40"
-      >
-        <BackIcon />
-        {d.backProjects}
-      </Link>
 
       <main className="relative z-10 px-4 pb-20 pt-28 sm:pt-32">
         <div className="wrap mx-auto max-w-[1080px]">

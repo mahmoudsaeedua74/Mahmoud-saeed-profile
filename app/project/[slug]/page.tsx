@@ -83,14 +83,6 @@ export default function ProjectViewPage() {
     <div ref={pageRef} className="relative min-h-screen overflow-hidden bg-[#05070A] text-white">
       <Background />
 
-      <button
-        onClick={() => router.back()}
-        className="fixed left-6 top-6 z-50 flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/80 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition hover:border-indigo-500/40 hover:bg-slate-900"
-      >
-        <ArrowLeft size={18} />
-        Back
-      </button>
-
       {/* Hero */}
       <section ref={heroRef} className="relative z-10 pt-28">
         <div className="wrap">
