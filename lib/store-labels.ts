@@ -18,7 +18,7 @@ export const storeLabels = {
   themeInDevelopment: 'In development',
   themePublishingSoon: 'Publishing soon on Zid marketplace',
   themeMarketplace: 'Zid marketplace theme',
-  sdkCustom: 'Custom SDK solution',
+  sdkCustom: 'SDK',
   sdkShowcasingSoon: 'In development — showcasing in portfolio soon',
   projectDetail: {
     backProjects: 'All projects',
@@ -28,6 +28,9 @@ export const storeLabels = {
     improvements: 'Improvements made',
     compareTitle: 'Before & after — see the difference',
     compareDesc: 'Side by side, no dragging: before vs. after the updates.',
+    finalStoreTitle: 'Store after CSS',
+    finalStoreDesc:
+      'Full storefront screenshot after custom CSS — first delivery on this project, without a before capture.',
     cssNote:
       'Custom CSS on a ready-made Zid or Salla theme — only the touched areas are listed below.',
     sdkNote:

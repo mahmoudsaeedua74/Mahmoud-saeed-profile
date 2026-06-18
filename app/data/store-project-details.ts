@@ -80,6 +80,53 @@ export function getComparisonViewports(comparison: ProjectComparison): Compariso
 export function hasComparisonContent(comparison: ProjectComparison): boolean {
   return getComparisonViewports(comparison).some((row) => row.beforeImage || row.afterImage);
 }
+
+export function comparisonHasBeforeImage(comparison: ProjectComparison): boolean {
+  return getComparisonViewports(comparison).some((row) => Boolean(row.beforeImage));
+}
+
+export type FinalStoreShowcase = {
+  id: string;
+  image: string;
+  title?: LocalizedString;
+};
+
+export function getBeforeAfterComparisons(detail: ProjectDetail): ProjectComparison[] {
+  return getProjectComparisons(detail).filter(
+    (comparison) => hasComparisonContent(comparison) && comparisonHasBeforeImage(comparison)
+  );
+}
+
+export function getFinalStoreShowcases(detail: ProjectDetail): FinalStoreShowcase[] {
+  const showcases: FinalStoreShowcase[] = [];
+
+  for (const comparison of getProjectComparisons(detail)) {
+    if (comparisonHasBeforeImage(comparison)) continue;
+
+    const viewports = getComparisonViewports(comparison).filter((row) => row.afterImage);
+    if (!viewports.length) continue;
+
+    if (viewports.length === 1 && viewports[0].id === 'single') {
+      showcases.push({
+        id: comparison.id,
+        image: viewports[0].afterImage!,
+        title: comparison.title,
+      });
+      continue;
+    }
+
+    for (const viewport of viewports) {
+      showcases.push({
+        id: `${comparison.id}-${viewport.id}`,
+        image: viewport.afterImage!,
+        title: comparison.title,
+      });
+    }
+  }
+
+  return showcases;
+}
+
 export const projectDetails: ProjectDetail[] = [
   {
     projectId: 'orya',

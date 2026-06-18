@@ -5,8 +5,10 @@ import { notFound } from 'next/navigation';
 import Background from '@/app/components/Background';
 import ContactSection from '@/app/components/ContactSection';
 import ModificationCompare from '@/app/components/store/ModificationCompare';
+import StorefrontPreview from '@/app/components/store/StorefrontPreview';
 import {
-  getProjectComparisons,
+  getBeforeAfterComparisons,
+  getFinalStoreShowcases,
   getStoreProjectDetail,
 } from '@/app/data/store-project-details';
 import { getStoreProject, platformColor } from '@/app/data/store-projects';
@@ -62,7 +64,8 @@ export default function StoreProjectDetailClient({ id }: { id: string }) {
   const platformLabel =
     project.platform === 'zid' ? storeLabels.platformZid : storeLabels.platformSalla;
   const color = platformColor[project.platform];
-  const comparisons = getProjectComparisons(detail);
+  const beforeAfterComparisons = getBeforeAfterComparisons(detail);
+  const finalShowcases = getFinalStoreShowcases(detail);
   const categoryLabel = storeLabels.category[project.category];
   const detailBadge = project.category === 'sdk' ? d.badgeSdk : d.badgeCss;
   const detailNote = project.category === 'sdk' ? d.sdkNote : d.cssNote;
@@ -111,7 +114,7 @@ export default function StoreProjectDetailClient({ id }: { id: string }) {
             )}
           </section>
 
-          {comparisons.length > 0 && (
+          {beforeAfterComparisons.length > 0 && (
             <section className="mb-10 sm:mb-12">
               <div className="mb-6 max-w-[640px]">
                 <h2 className="type-section-title font-extrabold text-white">{d.compareTitle}</h2>
@@ -120,7 +123,7 @@ export default function StoreProjectDetailClient({ id }: { id: string }) {
                 </p>
               </div>
               <div className="space-y-12 sm:space-y-16">
-                {comparisons.map((comparison) => (
+                {beforeAfterComparisons.map((comparison) => (
                   <div key={comparison.id}>
                     {(comparison.title || comparison.description) && (
                       <div className="mb-5 max-w-[640px]">
@@ -137,6 +140,30 @@ export default function StoreProjectDetailClient({ id }: { id: string }) {
                       </div>
                     )}
                     <ModificationCompare comparison={comparison} projectTitle={project.title} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {finalShowcases.length > 0 && (
+            <section className="mb-10 sm:mb-12">
+              <div className="mb-6 max-w-[640px]">
+                <h2 className="type-section-title font-extrabold text-white">{d.finalStoreTitle}</h2>
+                <p className="type-body mt-2 text-slate-400">{d.finalStoreDesc}</p>
+              </div>
+              <div className="space-y-8">
+                {finalShowcases.map((showcase) => (
+                  <div key={showcase.id}>
+                    {showcase.title && (
+                      <h3 className="type-card-title mb-4 font-bold text-white">
+                        {en(showcase.title)}
+                      </h3>
+                    )}
+                    <StorefrontPreview
+                      src={showcase.image}
+                      alt={`${project.title} — ${d.finalStoreTitle}`}
+                    />
                   </div>
                 ))}
               </div>
